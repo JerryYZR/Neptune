@@ -13,15 +13,15 @@
             </div>
             <el-table :data="corporationData" border style="width: 100%" ref="multipleTable" >
                 <el-table-column type="selection" align="center" width="55"></el-table-column>
-                <el-table-column prop="name" label="组织编号" align="center" width="170">
+                <el-table-column prop="org_id" label="组织编号" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="amount" label="组织名称" align="center" width="170">
+                <el-table-column prop="org_name" label="组织名称" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="time" label="组织类型" align="center" width="170">
+                <el-table-column prop="org_type" label="组织类型" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="life_time" label="创建人员" align="center" width="170">
+                <el-table-column prop="create_person" label="创建人员" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="remark" label="创建时间" align="center" width="291">
+                <el-table-column prop="create_time" label="创建时间" align="center" width="291">
                 </el-table-column>
                 <el-table-column label="操作" align="center" width="250">
                     <template slot-scope="scope">
@@ -208,23 +208,12 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      let formData = new FormData();
-      formData.append("id", 2);
-
-      let config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
       this.$axios
-        .post(
-          "http://localhost:8084/getMaterialsByOrganizationId",
-          formData,
-          config
-        )
+        .get("/orgInfo")
         .then(response => {
           if (response.status === 200) {
-            this.corporationData = response.data;
+            this.corporationData = response.data.data;
+            console.log(this.corporationData)
           }
         });
     },
@@ -264,11 +253,6 @@ export default {
         this.form.application_description
       );
 
-      let config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
       this.$axios
         .post("http://localhost:8084/updateGoods", formData, config)
         .then(response => {
@@ -295,11 +279,7 @@ export default {
       let formData = new FormData();
 
       formData.append("id", this.item.id);
-      let config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
+
       this.$axios
         .post("http://localhost:8084/deleteGoodsById", formData, config)
         .then(response => {
@@ -311,6 +291,7 @@ export default {
               });
               this.addVisible = false;
             } else {
+              console.log(config.headers)
               this.$message({
                 type: "success",
                 message: response.data.message
