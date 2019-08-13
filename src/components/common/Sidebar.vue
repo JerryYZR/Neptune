@@ -64,11 +64,11 @@
                         subs: [
                             {
                                 index: 'form',
-                                title: '基本表单'
+                                title: '故障处理'
                             },
                             {
                                 index: 'editor',
-                                title: '富文本编辑器'
+                                title: '故障报备'
                             },
                             {
                                 index: 'markdown',
