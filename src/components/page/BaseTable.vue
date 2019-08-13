@@ -11,8 +11,12 @@
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
-            <el-table :data="corporationData" border style="width: 100%" ref="multipleTable" >
-                <el-table-column type="selection" align="center" width="55"></el-table-column>
+            <el-table :data="corporationData" border style="width: 100%" ref="multipleTable"  @selection-change="handleSelectionChange">
+                <el-table-column align="center" width="55">
+                    <template slot-scope="scope">
+                        <div>{{scope.$index+1}}</div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="orgId" label="组织编号" align="center" width="170">
                 </el-table-column>
                 <el-table-column prop="orgName" label="组织名称" align="center" width="170">
@@ -89,7 +93,7 @@
         <el-dialog title="编辑组织" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
-                    {{form.orgNum}}
+                    {{form.orgId}}
                 </el-form-item>
                 <el-form-item label="组织名称">
                     <el-input v-model="form.orgName"></el-input>
@@ -128,7 +132,7 @@
         <el-dialog title="删除组织" :visible.sync="delVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
-                    {{form.orgNum}}
+                    {{form.orgId}}
                 </el-form-item>
                 <el-form-item label="组织名称">
                     {{form.orgName}}
@@ -186,9 +190,7 @@ export default {
       url: "./static/vuetable.json",
       cur_page: 1,
       multipleSelection: [],
-      select_cate: "",
       select_word: "",
-      del_list: [],
       is_search: false,
       editVisible: false,
       delVisible: false,
@@ -198,13 +200,7 @@ export default {
       editCorporationVisible: false,
       corporationData: [],
       masterData: [],
-      form: {
-        name: "",
-        type: "",
-        corporation_description: "",
-        approval: "",
-        application_description: ""
-      },
+      form: {},
       pagesize: 10,
       idx: -1
     };
@@ -220,13 +216,20 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      this.$axios.get("/api/api/orgInfo").then(response => {
-        if (response.status === 200) {
-          this.corporationData = response.data.records;
-          console.log(1)
-          console.log(this.corporationData);
-        }
-      });
+      this.$axios
+        .get(
+          "/api/api/orgInfo?pageNum=" +
+            this.cur_page +
+            "&orgName=" +
+            this.select_word
+        )
+        .then(response => {
+          if (response.status === 200) {
+            this.corporationData = response.data.records;
+            console.log(1);
+            console.log(this.corporationData);
+          }
+        });
 
       this.$axios.get("/api/api/admin").then(response => {
         if (response.status === 200) {
@@ -235,24 +238,49 @@ export default {
         }
       });
     },
-    search() {
-      this.is_search = true;
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
     },
-    filterTag(value, row) {
-      return row.tag === value;
+    search() {
+      this.$axios
+        .get(
+          "/api/api/orgInfo?pageNum=" +
+            this.cur_page +
+            "&orgName=" +
+            this.select_word
+        )
+        .then(response => {
+          if (response.status === 200) {
+            this.corporationData = response.data.records;
+            console.log(1);
+            console.log(this.corporationData);
+          }
+        });
     },
     handleEdit(index, row) {
       this.idx = index;
       const item = this.corporationData[index];
       this.form = {
-        name: item.name,
-        date: item.amount,
-        address: item.time
+        orgId: item.orgId,
+        orgName: item.orgName,
+        orgDesc: item.orgDesc,
+        type: item.type,
+        auditor: item.auditor,
+        applyDesc: item.applyDesc
       };
       this.editVisible = true;
     },
     handleDelete(index, row) {
       this.idx = index;
+      const item = this.corporationData[index];
+      this.form = {
+        orgId: item.orgId,
+        orgName: item.orgName,
+        orgDesc: item.orgDesc,
+        type: item.type,
+        auditor: item.auditor,
+        applyDesc: item.applyDesc
+      };
       this.delVisible = true;
     },
     submitAdd() {
@@ -337,7 +365,7 @@ export default {
       formData.append("orgDesc", "");
       formData.append("auditor", "");
       formData.append("applyDesc", "");
-      formData.append("applyType", "修改");
+      formData.append("applyType", "删除");
       formData.append("orgId", this.form.orgId);
 
       let config = {
@@ -346,23 +374,25 @@ export default {
         }
       };
 
-      this.$axios.post("/api/api/orgApply", convert_FormData_to_json2(formData), config).then(response => {
-        if (response.status === 200) {
-          this.$message({
-            type: response.type,
-            message: response.message
-          });
-          this.deleteVisible = false;
-          this.deleteCorporationVisible = false;
-          this.reload();
-        } else {
-          this.$message({
-            type: "error",
-            message: response.message
-          });
-          this.deleteCorporationVisible = false;
-        }
-      });
+      this.$axios
+        .post("/api/api/orgApply", convert_FormData_to_json2(formData), config)
+        .then(response => {
+          if (response.status === 200) {
+            this.$message({
+              type: response.type,
+              message: response.message
+            });
+            this.deleteVisible = false;
+            this.deleteCorporationVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type: "error",
+              message: response.message
+            });
+            this.deleteCorporationVisible = false;
+          }
+        });
     }
   }
 };

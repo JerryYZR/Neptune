@@ -8,18 +8,27 @@
         <div class="container">
             <div class="handle-box">
                 <el-select v-model="select_cate" placeholder="审批状态" class="handle-select mr10">
-                    <el-option key="1" label="新增" value="新增"></el-option>
-                    <el-option key="2" label="修改" value="修改"></el-option>
-                    <el-option key="3" label="删除" value="删除"></el-option>
+                    <el-option key="0" label="待审核" value="0"></el-option>
+                    <el-option key="1" label="审核通过" value="1"></el-option>
+                    <el-option key="2" label="审核未通过" value="2"></el-option>
                 </el-select>
                 <el-input v-model="select_word" placeholder="搜索组织名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
             <el-table :data="applyData" border style="width: 100%" ref="multipleTable" >
-                <el-table-column type="selection" align="center" width="55"></el-table-column>
+                <el-table-column align="center" width="55">
+                    <template slot-scope="scope">
+                        <div>{{scope.$index+1}}</div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="orgApplyId" label="申请单" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="state" label="审批状态" align="center" width="170">
+                <el-table-column label="审批状态" align="center" width="170">
+                    <template slot-scope="scope">
+                        <div v-if="applyData[scope.$index].state == 0">待审核</div>
+                        <div v-if="applyData[scope.$index].state == 1">审核通过</div>
+                        <div v-if="applyData[scope.$index].state == 2">审核未通过</div>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="orgName" label="组织名称" align="center" width="170">
                 </el-table-column>
@@ -31,7 +40,7 @@
                 </el-table-column>
                 <el-table-column label="操作" align="center" width="200">
                     <template slot-scope="scope">
-                        <el-button size="small" @click="handleEdit(scope.$index, scope.row)">审批</el-button>
+                        <el-button v-show="applyData[scope.$index].state == 0" size="small" @click="handleEdit(scope.$index, scope.row)">审批</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -47,8 +56,8 @@
 
         <!-- 审批新增单 -->
         <el-dialog title="审批新增单" :visible.sync="applyAddVisible" width="30%">
-            <el-button type="primary" icon="search" @click="search">拒绝</el-button>
-            <el-button type="primary" icon="search" @click="search">同意</el-button>
+            <el-button type="primary" icon="search" @click="deleteVisible = true">拒绝</el-button>
+            <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织名称">
                     {{form.orgName}}
@@ -75,10 +84,10 @@
             </el-form>
         </el-dialog>
 
-        <!-- 编辑弹出框 -->
+        <!-- 审批修改单 -->
         <el-dialog title="审批修改单" :visible.sync="applyEditVisible" width="30%">
-            <el-button type="primary" icon="search" @click="delVisible">拒绝</el-button>
-            <el-button type="primary" icon="search" @click="addVisible">同意</el-button>
+            <el-button type="primary" icon="search" @click="deleteVisible = true">拒绝</el-button>
+            <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
                     {{form.orgId}}
@@ -122,20 +131,20 @@
         </el-dialog>
 
         <!-- 同意提示框 -->
-        <el-dialog title="提示" :visible.sync="editCorporationVisible" width="300px" center>
+        <el-dialog title="提示" :visible.sync="editVisible" width="300px" center>
             <div class="del-dialog-cnt">是否确定修改？</div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editCorporationVisible = false">取 消</el-button>
-                <el-button type="primary" @click="submitEdit">确 定</el-button>
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submit(true)">确 定</el-button>
             </span>
         </el-dialog>
 
         <!-- 拒绝提示框 -->
-        <el-dialog title="提示" :visible.sync="deleteCorporationVisible" width="300px" center>
+        <el-dialog title="提示" :visible.sync="deleteVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="deleteCorporationVisible = false">取 消</el-button>
-                <el-button type="primary" @click="submitDelete">确 定</el-button>
+                <el-button @click="deleteVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submit(false)">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -153,16 +162,11 @@ export default {
       multipleSelection: [],
       select_cate: "",
       select_word: "",
-      del_list: [],
-      is_search: false,
       applyEditVisible: false,
       applyAddVisible: false,
       editVisible: false,
-      delVisible: false,
+      deleteVisible: false,
       addVisible: false,
-      addCorporationVisible: false,
-      deleteCorporationVisible: false,
-      editCorporationVisible: false,
       applyData: [],
       masterData: [],
       form: {},
@@ -182,9 +186,15 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-
       this.$axios
-        .get("/api/api/orgApply?pageNum=" + this.cur_page)
+        .get(
+          "/api/api/orgApply?pageNum=" +
+            this.cur_page +
+            "&state=" +
+            this.select_cate +
+            "&orgName=" +
+            this.select_word
+        )
         .then(response => {
           if (response.status === 200) {
             this.applyData = response.data.records;
@@ -200,18 +210,29 @@ export default {
       });
     },
     search() {
-      this.is_search = true;
-    },
-    filterTag(value, row) {
-      return row.tag === value;
+      this.$axios
+        .get(
+          "/api/api/orgApply?pageNum=" +
+            this.cur_page +
+            "&state=" +
+            this.select_cate +
+            "&orgName=" +
+            this.select_word
+        )
+        .then(response => {
+          if (response.status === 200) {
+            this.applyData = response.data.records;
+            console.log(this.applyData);
+          }
+        });
     },
     handleEdit(index, row) {
       this.idx = index;
       const item = this.applyData[index];
 
       this.form = item;
-      console.log(this.form)
-      
+      console.log(this.form);
+
       if (item.applyType == "新建") {
         this.applyAddVisible = true;
       } else {
@@ -224,13 +245,15 @@ export default {
 
             this.applyEditVisible = true;
           }
-        });   
+        });
       }
     },
-    submitAdd() {
+    submit(flag) {
       let formData = new FormData();
 
-      formData.append("orgName", this.form.orgApplyId);
+      console.log(flag);
+
+      formData.append("isAgree", flag);
 
       let config = {
         headers: {
@@ -238,7 +261,11 @@ export default {
         }
       };
       this.$axios
-        .post("/api/api/orgInfo", convert_FormData_to_json2(formData), config)
+        .put(
+          "/api/api/confirm/" + this.form.orgApplyId,
+          convert_FormData_to_json2(formData),
+          config
+        )
         .then(response => {
           if (response.status === 200) {
             this.$message({
@@ -246,14 +273,12 @@ export default {
               message: response.message
             });
             this.addVisible = false;
-            this.addCorporationVisible = false;
             this.reload();
           } else {
             this.$message({
               type: "error",
               message: response.message
             });
-            this.addCorporationVisible = false;
           }
         });
     }
