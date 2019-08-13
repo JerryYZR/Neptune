@@ -13,15 +13,15 @@
             </div>
             <el-table :data="corporationData" border style="width: 100%" ref="multipleTable" >
                 <el-table-column type="selection" align="center" width="55"></el-table-column>
-                <el-table-column prop="org_id" label="组织编号" align="center" width="170">
+                <el-table-column prop="orgId" label="组织编号" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="org_name" label="组织名称" align="center" width="170">
+                <el-table-column prop="orgName" label="组织名称" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="org_type" label="组织类型" align="center" width="170">
+                <el-table-column prop="orgType" label="组织类型" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="create_person" label="创建人员" align="center" width="170">
+                <el-table-column prop="createPerson" label="创建人员" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="create_time" label="创建时间" align="center" width="291">
+                <el-table-column prop="createTime" label="创建时间" align="center" width="291">
                 </el-table-column>
                 <el-table-column label="操作" align="center" width="250">
                     <template slot-scope="scope">
@@ -44,27 +44,30 @@
         <el-dialog title="添加组织" :visible.sync="addVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织名称">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.orgName"></el-input>
                 </el-form-item>
                 <el-form-item label="组织类型">
                     <el-select v-model="form.type" placeholder="请选择">
-                        <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                        <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                        <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                        <el-option key="总行" label="总行" value="总行"></el-option>
+                        <el-option key="分行" label="分行" value="分行"></el-option>
+                        <el-option key="行外" label="行外" value="行外"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="组织描述">
-                    <el-input v-model="form.corporation_description"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
                 </el-form-item>
                 <el-form-item label="审批人">
-                    <el-select v-model="form.approval" placeholder="请选择">
-                        <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                        <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                        <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                    <el-select v-model="form.auditor" placeholder="请选择">
+                        <el-option
+                            v-for="(item,index) in masterData"
+                            :key="index"
+                            :label="item.userId + ' ' +item.nickname"
+                            :value="item.userId"
+                        ></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="申请描述">
-                    <el-input v-model="form.application_description"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.applyDesc"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -86,30 +89,33 @@
         <el-dialog title="编辑组织" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
-                    {{form.name}}
+                    {{form.orgNum}}
                 </el-form-item>
                 <el-form-item label="组织名称">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.orgName"></el-input>
                 </el-form-item>
                 <el-form-item label="组织类型">
-                    <el-select v-model="form.region" placeholder="请选择">
-                        <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                        <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                        <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                    <el-select v-model="form.type" placeholder="请选择">
+                        <el-option key="总行" label="总行" value="总行"></el-option>
+                        <el-option key="分行" label="分行" value="分行"></el-option>
+                        <el-option key="行外" label="行外" value="行外"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="组织描述">
-                    <el-input type="textarea" rows="5" v-model="form.address"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
                 </el-form-item>
                 <el-form-item label="审批人">
-                    <el-select v-model="form.region" placeholder="请选择">
-                        <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                        <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                        <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                    <el-select v-model="form.auditor" placeholder="请选择">
+                        <el-option
+                            v-for="(item,index) in masterData"
+                            :key="index"
+                            :label="item.userId + ' ' +item.nickname"
+                            :value="item.userId"
+                        ></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="申请描述">
-                    <el-input type="textarea" rows="5" v-model="form.address"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.applyDesc"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -122,23 +128,26 @@
         <el-dialog title="删除组织" :visible.sync="delVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
-                    {{form.name}}
+                    {{form.orgNum}}
                 </el-form-item>
                 <el-form-item label="组织名称">
-                    {{form.name}}
+                    {{form.orgName}}
                 </el-form-item>
                 <el-form-item label="组织描述">
-                    {{form.address}}
+                    {{form.orgDesc}}
                 </el-form-item>
                 <el-form-item label="审批人">
-                    <el-select v-model="form.region" placeholder="请选择">
-                        <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                        <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                        <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                    <el-select v-model="form.auditor" placeholder="请选择">
+                        <el-option
+                            v-for="(item,index) in masterData"
+                            :key="index"
+                            :label="item.userId + ' ' +item.nickname"
+                            :value="item.userId"
+                        ></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="申请描述">
-                    <el-input type="textarea" rows="5" v-model="form.address"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.applyDesc"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -168,7 +177,9 @@
 </template>
 
 <script>
+import convert_FormData_to_json2 from "../page/other";
 export default {
+  inject: ["reload"],
   name: "basetable",
   data() {
     return {
@@ -186,6 +197,7 @@ export default {
       deleteCorporationVisible: false,
       editCorporationVisible: false,
       corporationData: [],
+      masterData: [],
       form: {
         name: "",
         type: "",
@@ -208,14 +220,20 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      this.$axios
-        .get("/orgInfo")
-        .then(response => {
-          if (response.status === 200) {
-            this.corporationData = response.data.data;
-            console.log(this.corporationData)
-          }
-        });
+      this.$axios.get("/api/api/orgInfo").then(response => {
+        if (response.status === 200) {
+          this.corporationData = response.data.records;
+          console.log(1)
+          console.log(this.corporationData);
+        }
+      });
+
+      this.$axios.get("/api/api/admin").then(response => {
+        if (response.status === 200) {
+          this.masterData = response.data;
+          console.log(this.masterData);
+        }
+      });
     },
     search() {
       this.is_search = true;
@@ -237,113 +255,114 @@ export default {
       this.idx = index;
       this.delVisible = true;
     },
+    submitAdd() {
+      let formData = new FormData();
+
+      formData.append("orgName", this.form.orgName);
+      formData.append("type", this.form.type);
+      formData.append("orgDesc", this.form.orgDesc);
+      formData.append("auditor", this.form.auditor);
+      formData.append("applyDesc", this.form.applyDesc);
+      formData.append("applyType", "新建");
+      formData.append("orgId", "");
+
+      let config = {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
+      this.$axios
+        .post("/api/api/orgApply", convert_FormData_to_json2(formData), config)
+        .then(response => {
+          if (response.status === 200) {
+            this.$message({
+              type: response.type,
+              message: response.message
+            });
+            this.addVisible = false;
+            this.addCorporationVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type: "error",
+              message: response.message
+            });
+            this.addCorporationVisible = false;
+          }
+        });
+    },
     // 保存编辑
     submitEdit() {
       let formData = new FormData();
 
-      formData.append("name", this.form.name);
+      formData.append("orgName", this.form.orgName);
       formData.append("type", this.form.type);
-      formData.append(
-        "corporation_description",
-        this.form.corporation_description
-      );
-      formData.append("approval", this.form.approval);
-      formData.append(
-        "application_description",
-        this.form.application_description
-      );
+      formData.append("orgDesc", this.form.orgDesc);
+      formData.append("auditor", this.form.auditor);
+      formData.append("applyDesc", this.form.applyDesc);
+      formData.append("applyType", "修改");
+      formData.append("orgId", this.form.orgId);
+
+      let config = {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
 
       this.$axios
-        .post("http://localhost:8084/updateGoods", formData, config)
+        .post("/api/api/orgApply", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
-            if (response.data.code == 500) {
-              this.$message({
-                type: "error",
-                message: response.data.message
-              });
-              this.editVisible = false;
-            } else {
-              this.$message({
-                type: "success",
-                message: response.data.message
-              });
-              this.editVisible = false;
-              this.editCorporationVisible = false;
-              this.reload();
-            }
+            this.$message({
+              type: response.type,
+              message: response.message
+            });
+            this.editVisible = false;
+            this.editCorporationVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type: "error",
+              message: response.message
+            });
+            this.editCorporationVisible = false;
           }
         });
     },
     submitDelete() {
       let formData = new FormData();
 
-      formData.append("id", this.item.id);
-
-      this.$axios
-        .post("http://localhost:8084/deleteGoodsById", formData, config)
-        .then(response => {
-          if (response.status === 200) {
-            if (response.data.code == 500) {
-              this.$message({
-                type: "error",
-                message: response.data.message
-              });
-              this.addVisible = false;
-            } else {
-              console.log(config.headers)
-              this.$message({
-                type: "success",
-                message: response.data.message
-              });
-              this.deleteVisible = false;
-              this.reload();
-              this.deleteCorporationVisible = false;
-            }
-          }
-        });
-    },
-    submitAdd() {
-      let formData = new FormData();
-
-      formData.append("name", this.form.name);
-      formData.append("type", this.form.type);
-      formData.append(
-        "corporation_description",
-        this.form.corporation_description
-      );
-      formData.append("approval", this.form.approval);
-      formData.append(
-        "application_description",
-        this.form.application_description
-      );
+      formData.append("orgName", "");
+      formData.append("type", "");
+      formData.append("orgDesc", "");
+      formData.append("auditor", "");
+      formData.append("applyDesc", "");
+      formData.append("applyType", "修改");
+      formData.append("orgId", this.form.orgId);
 
       let config = {
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "application/json"
         }
       };
-      this.$axios
-        .post("http://localhost:8084/addCorporation", formData, config)
-        .then(response => {
-          if (response.status === 200) {
-            if (response.data.code == 500) {
-              this.$message({
-                type: "error",
-                message: response.data.message
-              });
-              this.addVisible = false;
-            } else {
-              this.$message({
-                type: "success",
-                message: response.data.message
-              });
-              this.addVisible = false;
-              this.reload();
-              this.addCorporationVisible = false;
-            }
-          }
-        });
+
+      this.$axios.post("/api/api/orgApply", convert_FormData_to_json2(formData), config).then(response => {
+        if (response.status === 200) {
+          this.$message({
+            type: response.type,
+            message: response.message
+          });
+          this.deleteVisible = false;
+          this.deleteCorporationVisible = false;
+          this.reload();
+        } else {
+          this.$message({
+            type: "error",
+            message: response.message
+          });
+          this.deleteCorporationVisible = false;
+        }
+      });
     }
   }
 };

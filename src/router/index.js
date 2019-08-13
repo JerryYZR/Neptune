@@ -75,6 +75,12 @@ export default new Router({
                     path: '/test',
                     component: resolve => require(['../components/page/Test.vue'], resolve),
                     meta: { title: '测试', permission: true }
+                },
+                {
+                    // 组织审批页面
+                    path: '/organization_approval',
+                    component: resolve => require(['../components/page/OrganizationApproval.vue'], resolve),
+                    meta: { title: '组织审批', permission: true }
                 }
             ]
         },

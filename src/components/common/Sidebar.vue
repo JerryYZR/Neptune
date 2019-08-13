@@ -47,7 +47,7 @@
                             },
                             {
                                 icon: 'el-icon-rank',
-                                index: 'drag',
+                                index: 'organization_approval',
                                 title: '组织审批'
                             }
                         ]
