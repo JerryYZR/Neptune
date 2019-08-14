@@ -36,7 +36,7 @@
                 border
                 style="width: 100%">
                 <el-table-column label="序号" align="center" width="70" fixed="left">
-                    <template scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
+                    <template slot-scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
                 </el-table-column>
                 <el-table-column
                     prop="faultTitle"
