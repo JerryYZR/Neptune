@@ -86,7 +86,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
 
@@ -94,7 +95,7 @@ export default {
         .post("/api/login", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
-            localStorage.setItem("token", response.data);
+            localStorage.setItem("token", response.data.token);
             localStorage.setItem('ms_username',this.ruleForm.username);
             this.$router.push("/");
           } else {
@@ -119,7 +120,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
 

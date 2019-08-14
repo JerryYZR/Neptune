@@ -186,6 +186,12 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgApply?pageNum=" +
@@ -193,7 +199,8 @@ export default {
             "&state=" +
             this.select_cate +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -202,7 +209,7 @@ export default {
           }
         });
 
-      this.$axios.get("/api/api/admin").then(response => {
+      this.$axios.get("/api/api/isAdmin", config).then(response => {
         if (response.status === 200) {
           this.masterData = response.data;
           console.log(this.masterData);
@@ -210,6 +217,13 @@ export default {
       });
     },
     search() {
+
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgApply?pageNum=" +
@@ -217,7 +231,8 @@ export default {
             "&state=" +
             this.select_cate +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -233,10 +248,16 @@ export default {
       this.form = item;
       console.log(this.form);
 
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       if (item.applyType == "新建") {
         this.applyAddVisible = true;
       } else {
-        this.$axios.get("/api/api/orgInfo/" + 1).then(response => {
+        this.$axios.get("/api/api/orgInfo/" + 1, config).then(response => {
           if (response.status === 200) {
             this.form1 = response.data;
             this.form.oldOrgName = this.form1.orgName;
@@ -257,7 +278,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
       this.$axios

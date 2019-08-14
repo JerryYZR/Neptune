@@ -105,12 +105,19 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgInfo?pageNum=" +
             this.cur_page +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -120,7 +127,7 @@ export default {
           }
         });
 
-      this.$axios.get("/api/api/role").then(response => {
+      this.$axios.get("/api/api/role", config).then(response => {
         if (response.status === 200) {
           this.roleData = response.data;
           console.log(this.roleData);
@@ -131,12 +138,19 @@ export default {
       this.multipleSelection = val;
     },
     search() {
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgInfo?pageNum=" +
             this.cur_page +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -154,7 +168,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
       for (item in multipleSelection) {
@@ -192,7 +207,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
 

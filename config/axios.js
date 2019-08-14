@@ -43,7 +43,7 @@ axios.interceptors.response.use(function (response) {
     }else if(response.data.code == 666){
         response.type = "error"
         response.message = response.data.message;
-    }else if(response.data.code == 500){
+    }else if(response.data.code == 670){
         response.type = "error"
         response.message = response.data.message;
         this.$router.push("/login#/login");

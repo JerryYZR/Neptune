@@ -223,12 +223,20 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
+
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgInfo?pageNum=" +
             this.cur_page +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -238,7 +246,7 @@ export default {
           }
         });
 
-      this.$axios.get("/api/api/admin").then(response => {
+      this.$axios.get("/api/api/isAdmin", config).then(response => {
         if (response.status === 200) {
           this.masterData = response.data;
           console.log(this.masterData);
@@ -249,12 +257,20 @@ export default {
       this.multipleSelection = val;
     },
     search() {
+
+      let config = {
+        headers: {
+          "token": localStorage.getItem("token")
+        }
+      };
+
       this.$axios
         .get(
           "/api/api/orgInfo?pageNum=" +
             this.cur_page +
             "&orgName=" +
-            this.select_word
+            this.select_word,
+            config
         )
         .then(response => {
           if (response.status === 200) {
@@ -303,7 +319,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
       this.$axios
@@ -340,7 +357,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
 
@@ -377,7 +395,8 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("token")
         }
       };
 
