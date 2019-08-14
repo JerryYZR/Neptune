@@ -81,7 +81,7 @@ export default {
     submitForm(formName) {
       let formData = new FormData();
 
-      formData.append("username", this.ruleForm.username);
+      formData.append("userName", this.ruleForm.username);
       formData.append("password", this.ruleForm.password);
 
       let config = {
@@ -94,7 +94,8 @@ export default {
         .post("/api/login", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
-            localStorage.setItem("ms_username", this.ruleForm.username);
+            localStorage.setItem("token", response.data);
+            localStorage.setItem('ms_username',this.ruleForm.username);
             this.$router.push("/");
           } else {
             this.$message({

@@ -11,7 +11,7 @@
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
-            <el-table :data="corporationData" border style="width: 100%" ref="multipleTable"  @selection-change="handleSelectionChange">
+            <el-table :data="corporationData" border style="width: 100%" ref="multipleTable">
                 <el-table-column align="center" width="55">
                     <template slot-scope="scope">
                         <div>{{scope.$index+1}}</div>
@@ -199,6 +199,13 @@ export default {
       deleteCorporationVisible: false,
       editCorporationVisible: false,
       corporationData: [],
+      corporationData1: [{
+          orgId: '1',
+          orgName: "3",
+          orgType: "3",
+          createPerson: "3",
+          createTime: "3"
+      }],
       masterData: [],
       form: {},
       pagesize: 10,
