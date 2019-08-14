@@ -84,6 +84,11 @@
                         icon: 'el-icon-star-on',
                         index: 'charts',
                         title: '合作方变更报备管理'
+                    },
+                    {
+                        icon: 'el-icon-star-on',
+                        index: 'user_manage',
+                        title: '用户角色管理'
                     }
                 ]
             }
