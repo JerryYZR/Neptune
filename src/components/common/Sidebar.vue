@@ -70,20 +70,30 @@
                                 index: 'editor',
                                 title: '故障报备'
                             },
-                            {
-                                index: 'markdown',
-                                title: 'markdown编辑器'
-                            },
-                            {
-                                index: 'upload',
-                                title: '文件上传'
-                            }
+//                            {
+//                                index: 'markdown',
+//                                title: 'markdown编辑器'
+//                            },
+//                            {
+//                                index: 'upload',
+//                                title: '文件上传'
+//                            }
                         ]
                     },
                     {
                         icon: 'el-icon-star-on',
                         index: 'charts',
-                        title: '合作方变更报备管理'
+                        title: '合作方变更报备管理',
+                        subs: [
+                            {
+                                index: 'reportConfirm',
+                                title: '报备确认'
+                            },
+                            {
+                                index: 'reportApply',
+                                title: '报备申请'
+                            }
+                        ]
                     },
                     {
                         icon: 'el-icon-star-on',

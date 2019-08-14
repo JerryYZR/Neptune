@@ -66,16 +66,16 @@
                 <el-table-column
                     prop="createdTime"
                     label="创建时间"
-                    width="150">
+                    width="202">
                 </el-table-column>
-                <el-table-column
-                    fixed="right"
-                    label="操作"
-                    width="100">
-                    <template slot-scope="scope">
-                        <el-button  @click.stop="deal" type="text" size="small" >处理</el-button>
-                    </template>
-                </el-table-column>
+                <!--<el-table-column-->
+                    <!--fixed="right"-->
+                    <!--label="操作"-->
+                    <!--width="100">-->
+                    <!--<template slot-scope="scope">-->
+                        <!--<el-button  @click.stop="deal" type="text" size="small" >处理</el-button>-->
+                    <!--</template>-->
+                <!--</el-table-column>-->
             </el-table>
 
             <!--处理故障单对话框-->

@@ -41,10 +41,10 @@ export default new Router({
                     meta: { title: '故障报备' }
                 },
                 {
-                    // markdown组件
-                    path: '/markdown',
-                    component: resolve => require(['../components/page/Markdown.vue'], resolve),
-                    meta: { title: 'markdown编辑器' }
+                    // 报备申请组件
+                    path: '/reportApply',
+                    component: resolve => require(['../components/page/reportApply.vue'], resolve),
+                    meta: { title: '报备申请' }
                 },
                 {
                     // 图片上传组件
@@ -53,10 +53,10 @@ export default new Router({
                     meta: { title: '文件上传' }
                 },
                 {
-                    // vue-schart组件
-                    path: '/charts',
-                    component: resolve => require(['../components/page/BaseCharts.vue'], resolve),
-                    meta: { title: 'schart图表' }
+                    // 报备确认组件
+                    path: '/reportConfirm',
+                    component: resolve => require(['../components/page/reportConfirm.vue'], resolve),
+                    meta: { title: '报备确认' }
                 },
                 {
                     // 拖拽列表组件
