@@ -95,9 +95,12 @@ export default {
         .post("/api/login", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
+              console.log(1123123123);
+              this.$router.push("/");
+
             localStorage.setItem("token", response.data.token);
             localStorage.setItem('ms_username',this.ruleForm.username);
-            this.$router.push("/");
+
           } else {
             this.$message({
               type: "error",

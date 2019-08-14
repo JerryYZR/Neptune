@@ -63,11 +63,11 @@
                         title: '运维故障单管理',
                         subs: [
                             {
-                                index: 'form',
+                                index: 'faultDeal',
                                 title: '故障处理'
                             },
                             {
-                                index: 'editor',
+                                index: 'faultApply',
                                 title: '故障报备'
                             },
 //                            {

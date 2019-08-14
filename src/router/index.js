@@ -30,14 +30,14 @@ export default new Router({
                     meta: { title: 'tab选项卡' }
                 },
                 {
-                    path: '/form',
-                    component: resolve => require(['../components/page/BaseForm.vue'], resolve),
+                    path: '/faultDeal',
+                    component: resolve => require(['../components/page/faultDeal.vue'], resolve),
                     meta: { title: '故障处理' }
                 },
                 {
-                    // 富文本编辑器组件
-                    path: '/editor',
-                    component: resolve => require(['../components/page/VueEditor.vue'], resolve),
+                    // 故障报备组件
+                    path: '/faultApply',
+                    component: resolve => require(['../components/page/faultApply.vue'], resolve),
                     meta: { title: '故障报备' }
                 },
                 {

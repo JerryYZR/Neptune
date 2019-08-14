@@ -2,10 +2,18 @@
     <div>
         <div class="container">
             <div class="handle-box">
-                <el-button type="primary" icon="search" @click="addDialog = true" style="width:100px;margin-right: 350px;">新增</el-button>
+                <el-button type="primary" icon="search" @click="addDialog = true" style="width:100px">新增</el-button>
                 <template>
+                    <el-select v-model="applicationValue" placeholder="应用">
+                        <el-option
+                            v-for="item in applicationOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-select
-                        v-model="status"
+                        v-model="statusValue"
                         collapse-tags
                         placeholder="状态">
                         <el-option
@@ -16,12 +24,13 @@
                         </el-option>
                     </el-select>
                 </template>
-                <el-input v-model="selectWord" placeholder="搜索标题" class="handle-input mr10" style="width: 150px"></el-input>
-                <!--<el-button type="primary" icon="search" >搜索</el-button>-->
+                <el-input v-model="selectWord" placeholder="搜索故障标题" class="handle-input mr10" style="width: 150px"></el-input>
                 <el-button icon="el-icon-search"  @click="search" type="info"></el-button>
             </div>
             <el-table
-                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :data="tableData"
+                :row-class-name="tableRowClassName"
+                @row-click="showDetail"
                 @click.stop ="true"
                 border
                 style="width: 100%">
@@ -29,8 +38,8 @@
                     <template slot-scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
                 </el-table-column>
                 <el-table-column
-                    prop="title"
-                    label="标题"
+                    prop="faultTitle"
+                    label="故障标题"
                     width="120">
                 </el-table-column>
                 <el-table-column
@@ -39,114 +48,98 @@
                     width="120">
                 </el-table-column>
                 <el-table-column
-                    prop="linkman"
+                    prop="faultApplication"
+                    label="故障应用"
+                    width="120">
+                </el-table-column>
+                <el-table-column
+                    prop="linkMan"
                     label="联系人"
                     width="120">
                 </el-table-column>
                 <el-table-column
                     prop="linkPhone"
                     label="联系方式"
-                    width="150">
+                    width="120">
                 </el-table-column>
                 <el-table-column
                     prop="createdTime"
                     label="创建时间"
-                    width="200">
-                </el-table-column>
-                <el-table-column
-                    fixed="right"
-                    label="操作"
-                    width="80">
-                    <template slot-scope="scope">
-                        <el-button  @click.stop="show" type="text" size="medium" ><i class="el-icon-info" style="font-size: 17px"></i></el-button>
-                        <el-button  @click.stop="rollback" type="text" size="medium" ><i class="el-icon-refresh-right" style="font-size: 17px"></i></el-button>
-                    </template>
+                    width="202">
                 </el-table-column>
             </el-table>
 
-            <!--查看报备单-->
+
+
+            <!--查看故障单对话框-->
             <el-dialog
-                title="查看报备单"
+                class="el-dialog__body"
+                title="查看故障单"
                 :visible.sync="showDialog"
                 width="35%"
                 :before-close="handleClose">
                 <template :data="choosedRow">
+                    <el-divider>故障单详情</el-divider>
                     <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">标题</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.title}}</div></el-col>
+                        <el-col :span="6"><div class="grid-content ">故障标题</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.faultTitle}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">内容</div></el-col>
+                        <el-col :span="6"><div class="grid-content ">故障内容</div></el-col>
                         <el-col :span="12"><div class="grid-content ">{{choosedRow.content}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">期望时间</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.expectedTime}}</div></el-col>
+                        <el-col :span="6"><div class="grid-content ">故障应用</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.faultApplication}}</div></el-col>
+                    </el-row>
+                    <el-row type="flex" class="row-bg" justify="center">
+                        <el-col :span="6"><div class="grid-content ">故障时间</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.createdTime}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content">联系人</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkMan}}</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkman}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content ">联系方式</div></el-col>
                         <el-col :span="12"><div class="grid-content ">{{choosedRow.linkPhone}}</div></el-col>
                     </el-row>
                 </template>
-            </el-dialog>
-
-
-            <!--撤销报备单-->
-            <el-dialog
-                title="撤销报备单"
-                :visible.sync="rollbackDialog"
-                width="35%"
-                :before-close="handleClose">
-                <template :data="choosedRow">
-                    <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">标题</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.title}}</div></el-col>
-                    </el-row>
-                    <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">内容</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.content}}</div></el-col>
-                    </el-row>
-                    <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">期望时间</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.expectedTime}}</div></el-col>
-                    </el-row>
-                    <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content">联系人</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkMan}}</div></el-col>
-                    </el-row>
-                    <el-row type="flex" class="row-bg" justify="center">
-                        <el-col :span="6"><div class="grid-content ">联系方式</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkPhone}}</div></el-col>
-                    </el-row>
+                <template>
+                    <el-divider>操作日志</el-divider>
+                    <template >
+                        <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
+                            <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.name+' '+item.time+' '+ item.reason"></el-step>
+                        </el-steps>
+                    </template>
                 </template>
                 <span slot="footer" class="dialog-footer">
-                    <el-button @click="rollbackDialog = false">取 消</el-button>
-                    <el-button type="primary" @click="rollbackDialog = false">确认撤销</el-button>
+                    <el-button @click="showDialog = false">取 消</el-button>
+                    <el-button type="primary" @click="showDialog = false">确 定</el-button>
                 </span>
             </el-dialog>
 
-
-
-
-            <!--添加报备单-->
-            <el-dialog title="添加报备单" :visible.sync="addDialog" width="35%">
+            <!--添加故障单对话框-->
+            <el-dialog title="添加故障单" :visible.sync="addDialog" width="35%">
                 <el-form :model="addForm"  :rules="addRules" >
-                    <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
-                        <el-input v-model="addForm.title" autocomplete="off" style="width:250px" req></el-input>
+                    <el-form-item label="故障标题" :label-width="formLabelWidth" prop="faultTitle">
+                        <el-input v-model="addForm.faultTitle" autocomplete="off" style="width:250px" req></el-input>
                     </el-form-item>
-                    <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
+                    <el-form-item label="故障内容" :label-width="formLabelWidth" prop="content">
                         <el-input type="textarea" v-model="addForm.content" style="width:250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="期望时间" :label-width="formLabelWidth" prop="time">
+                    <el-form-item label="故障应用" :label-width="formLabelWidth" prop="faultApplication">
+                        <el-select v-model="addForm.faultApplication" placeholder="请选择故障应用" style="width:250px">
+                            <el-option label="故障1" value="faultOne"></el-option>
+                            <el-option label="故障2" value="faultTwo"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="故障时间" :label-width="formLabelWidth" prop="createdTime">
                         <el-date-picker
                             style="width:250px"
-                            v-model="addForm.time"
+                            v-model="addForm.createdTime"
                             type="datetime"
-                            placeholder="选择期望日期">
+                            placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item  label="联系人" :label-width="formLabelWidth" prop="linkMan">
@@ -180,38 +173,37 @@
 
 
 <script>
-
-
-
     export default {
         name: 'editor',
         data: function(){
             return {
                 //分页相关
                 total:4,
-                pageSize:2,
+                pageSize:10,
                 currentPage:1,
 
-                //添加报备单
+
+                //新增故障报备
                 addDialog:false,
                 addForm:{
-                    title:'',
+                    faultTitle:'',
                     content:'',
-                    time:'',
+                    faultApplication:'',
+                    createdTime:'',
                     linkMan:'',
                     linkPhone:''
                 },
                 addRules:{
-                    title:[
+                    faultTitle:[
                         { required: true, message: '请输入故障标题', trigger: 'blur' }
                     ],
                     content:[
                         { required: true, message: '请输入故障内容', trigger: 'blur' }
                     ],
-                    application:[
+                    faultApplication:[
                         { required: true, message: '请选择故障应用', trigger: 'change' }
                     ],
-                    time:[
+                    createdTime:[
                         { required: true, message: '请选择故障时间', trigger: 'change' }
                     ],
                     linkMan:[
@@ -222,23 +214,32 @@
                     ]
                 },
 
-                //搜索
-                status:'',
+
+
+                //条件筛选
+                applicationValue: '',
+                statusValue:'',
+                selectWord: "",
+                applicationOptions: [{
+                    value: '0',
+                    label: 'F-ABC'
+                }, {
+                    value: '1',
+                    label: 'F-CDE'
+                }],
                 statusOptions:[
                     {
-                        value: 0,
-                        label: '已提交'
+                        value: '0',
+                        label: '已处理'
                     }, {
-                        value: 1,
-                        label: '已撤回'
-                    },{
-                        value: 2,
-                        label: '已完成'
+                        value: '1',
+                        label: '未处理'
                     }
                 ],
-                selectWord: "",
+
 
                 //表格
+//                tableData: [],
                 tableData: [
                     {
                         title:'首页报错1',
@@ -270,24 +271,38 @@
                     }
                 ],
 
+
+
                 //查看报备单详情
-                choosedRow:{
-                    title:'标题1',
-                    content:'内容1',
-                    expectedTime:'时间1',
-                    linkMan:'联系人1',
-                    linkPhone:'电话1',
+                choosedRow:{},
+                showDialog: false,
+                faultJournal:[
+                    {
+                        id:1,
+                        name:'1号',
+                        time:'2019-08-12 00：00：00',
+                        reason:'故障上报'
+                    },
+                    {
+                        id:2,
+                        name:'2号',
+                        time:'2019-08-12 00：00：00',
+                        reason:'故障上报'
+                    },
+                    {
+                        id:3,
+                        name:'3号',
+                        time:'2019-08-12 00：00：00',
+                        reason:'故障上报'
+                    }
+                ],
 
 
-                },
-                showDialog:false,
-
-                //撤销报备单
-                rollbackDialog:false,
 
                 index:-1,
                 formLabelWidth:'120px',
                 formInputWidth:'300px',
+
 
             }
         },
@@ -295,86 +310,82 @@
             this.getData();
         },
         methods: {
-
             //获取表单初始数据
             getData() {
-//                this.$axios
-//                    .post("/ticket")
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                        this.total = response.total;
-//                    });
+                this.$axios
+                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                this.tableData = response.data.records;
+                            }
+                        }
+                    );
             },
 
 
-            //页码修改
+            //分页跳转
             currentChange(currentPage){
                 console.log('现在所在的页',currentPage);
-                console.log('现在所在的页',this.tableData.slice((currentPage-1)*this.pageSize,currentPage*this.pageSize));
                 this.currentPage = currentPage;
-//                this.$axios
-//                    .post("/ticket",{
-//                        current:currentPage
-//                    })
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                    });
+                this.getData();
             },
 
-            //新增-确认上报
-            addRecord(value){
-                console.log('新增信息',this.addForm);
+
+            //添加故障单
+            addRecord(){
+                console.log(this.addForm);
+//                const formData = this.addForm;
+//                this.$axios
+//                    .get("/api/api/faultInfoSub",formData)
+//                    .then(response=>{
+//                            if (response.status === 200) {
+//                                this.addDialog = false;
+//                            }
+//                        }
+//                    );
                 this.addDialog = false;
+                console.log('确认上报');
             },
 
-            //搜索
+
+            // 根据条件搜索
             search(){
-                console.log('状态框value',this.status);
-                console.log('选择词value',this.selectWord);
-//                var url= '';
-//                var requestHead = {
+                console.log(this.applicationValue+','+this.statusValue+','+this.selectWord);
+                this.getData();
+            },
 
-//                    value2:this.value2,
-//                    selectWord:this.selectWord
-//                }
+
+            //查看详细信息
+            showDetail(row){
+                console.log('被点击的行',this.tableData[row.index]);
+                this.choosedRow = this.tableData[row.index];
 //                this.$axios
-//                    .post(url,requestHead)
+//                    .get('/api/api/faultInfo/'+this.choosedRow.faultId)
 //                    .then(function (response) {
-//                        console.log(response);
-//                    })
-//                    .catch(function (error) {
-//                        console.log(error);
+//                        console.log('单行结果',response);
 //                    });
+
+                this.showDialog = true;
+
+            },
+            tableRowClassName ({row, rowIndex}) {
+                //把每一行的索引放进row
+                row.index = rowIndex;
             },
 
 
-            //点击操作 - 查看按钮
-            show(){
-                console.log('点击查看按钮');
-                this.showDialog = true
-            },
-
-
-            //点击操作 - 撤销按钮 - 确认撤销
-            rollback(){
-                this.rollbackDialog = true
-            },
-            rollbackConfirm(){
-                //this
-            },
-
-
-            //对话框关闭
+            //处理对话框的关闭
             handleClose(done) {
                 this.$confirm('确认关闭？')
                     .then(_ => {
                         done();
                     })
                     .catch(_ => {});
-            }
+            },
+
+
         }
+
     }
 </script>
 
@@ -395,11 +406,11 @@
     }
 
     .el-dialog__body{
-        padding-top: 40px;
+        padding-top: 0px;
     }
 
     .el-dialog {
-        width:40%
+      width:40%
     }
 
 </style>
