@@ -24,115 +24,129 @@
 </template>
 
 <script>
-    import bus from '../common/bus';
-    export default {
-        data() {
-            return {
-                collapse: false,
-                items: [
-                    {
-                        icon: 'el-icon-setting',
-                        index: 'dashboard',
-                        title: '系统首页'
-                    },
-                    {
-                        icon: 'el-icon-tickets',
-                        index: 'table',
-                        title: '组织',
-                        subs: [
-                            {
-                                icon: 'el-icon-tickets',
-                                index: 'table',
-                                title: '组织管理'
-                            },
-                            {
-                                icon: 'el-icon-rank',
-                                index: 'organization_approval',
-                                title: '组织审批'
-                            }
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-message',
-                        index: 'tabs',
-                        title: '应用信息管理'
-                    },
-                    {
-                        icon: 'el-icon-date',
-                        index: '3',
-                        title: '运维故障单管理',
-                        subs: [
-                            {
-                                index: 'form',
-                                title: '故障处理'
-                            },
-                            {
-                                index: 'editor',
-                                title: '故障报备'
-                            },
-//                            {
-//                                index: 'markdown',
-//                                title: 'markdown编辑器'
-//                            },
-//                            {
-//                                index: 'upload',
-//                                title: '文件上传'
-//                            }
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-star-on',
-                        index: 'charts',
-                        title: '合作方变更报备管理',
-                        subs: [
-                            {
-                                index: 'reportConfirm',
-                                title: '报备确认'
-                            },
-                            {
-                                index: 'reportApply',
-                                title: '报备申请'
-                            }
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-star-on',
-                        index: 'user_manage',
-                        title: '用户角色管理'
-                    }
-                ]
-            }
+import bus from "../common/bus";
+export default {
+  data() {
+    return {
+      collapse: false,
+      items: [
+        {
+          icon: "el-icon-setting",
+          index: "dashboard",
+          title: "系统首页"
         },
-        computed:{
-            onRoutes(){
-                return this.$route.path.replace('/','');
+        {
+          icon: "el-icon-tickets",
+          index: "table",
+          title: "组织",
+          subs: [
+            {
+              icon: "el-icon-tickets",
+              index: "table",
+              title: "组织管理"
             }
+          ]
         },
-        created(){
-            // 通过 Event Bus 进行组件间通信，来折叠侧边栏
-            bus.$on('collapse', msg => {
-                this.collapse = msg;
-            })
+        {
+          icon: "el-icon-message",
+          index: "tabs",
+          title: "应用信息管理"
+        },
+        {
+          icon: "el-icon-date",
+          index: "3",
+          title: "运维故障单管理",
+          subs: [
+            {
+              index: "editor",
+              title: "故障报备"
+            }
+            //                            {
+            //                                index: 'markdown',
+            //                                title: 'markdown编辑器'
+            //                            },
+            //                            {
+            //                                index: 'upload',
+            //                                title: '文件上传'
+            //                            }
+          ]
+        },
+        {
+          icon: "el-icon-star-on",
+          index: "charts",
+          title: "合作方变更报备管理",
+          subs: [
+            {
+              index: "reportApply",
+              title: "报备申请"
+            }
+          ]
+        },
+        {
+          icon: "el-icon-star-on",
+          index: "user_manage",
+          title: "用户角色管理"
         }
+      ]
+    };
+  },
+  methods: {
+    isAdminOrNot() {
+      let role = localStorage.getItem("role");
+      if (role == "1") {
+        let temp = {
+          icon: "el-icon-rank",
+          index: "organization_approval",
+          title: "组织审批"
+        };
+        this.items[1].subs.push(temp);
+
+        let temp1 = {
+          index: "form",
+          title: "故障处理"
+        };
+        this.items[3].subs.push(temp1);
+
+        let temp2 = {
+          index: "reportConfirm",
+          title: "报备确认"
+        };
+        this.items[4].subs.push(temp2);
+      }
     }
+  },
+  computed: {
+    onRoutes() {
+      return this.$route.path.replace("/", "");
+    }
+  },
+  created() {
+    // 通过 Event Bus 进行组件间通信，来折叠侧边栏
+    bus.$on("collapse", msg => {
+      this.collapse = msg;
+    });
+
+    this.isAdminOrNot();
+  }
+};
 </script>
 
 <style scoped>
-    .sidebar{
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 70px;
-        bottom:0;
-        overflow-y: scroll;
-    }
-    .sidebar::-webkit-scrollbar{
-        width: 0;
-    }
-    .sidebar-el-menu:not(.el-menu--collapse){
-        width: 250px;
-    }
-    .sidebar > ul {
-        height:100%;
-    }
+.sidebar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 70px;
+  bottom: 0;
+  overflow-y: scroll;
+}
+.sidebar::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar-el-menu:not(.el-menu--collapse) {
+  width: 250px;
+}
+.sidebar > ul {
+  height: 100%;
+}
 </style>

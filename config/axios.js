@@ -3,7 +3,7 @@ import router from '../src/router';
 import VueRouter from '../node_modules/vue-router';
 
 // 配置默认的host,假如你的API host是：http://api.htmlx.club
-axios.defaults.baseURL = 'http://localhost:8081'
+// axios.defaults.baseURL = 'http://localhost:8081'
 // axios.defaults.config = {
 //     headers: {
 //         "Content-Type": "application/json",
