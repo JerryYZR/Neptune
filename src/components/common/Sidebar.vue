@@ -94,6 +94,11 @@
                                 title: '报备申请'
                             }
                         ]
+                    },
+                    {
+                        icon: 'el-icon-star-on',
+                        index: 'user_manage',
+                        title: '用户角色管理'
                     }
                 ]
             }

@@ -81,6 +81,12 @@ export default new Router({
                     path: '/organization_approval',
                     component: resolve => require(['../components/page/OrganizationApproval.vue'], resolve),
                     meta: { title: '组织审批', permission: true }
+                },
+                {
+                    // 用户角色管理页面
+                    path: '/user_manage',
+                    component: resolve => require(['../components/page/UserManage.vue'], resolve),
+                    meta: { title: '用户角色管理', permission: true }
                 }
             ]
         },

@@ -262,7 +262,7 @@ export default {
       };
       this.$axios
         .put(
-          "/api/api/confirm/" + this.form.orgApplyId,
+          "/api/api/admin/confirm/" + this.form.orgApplyId,
           convert_FormData_to_json2(formData),
           config
         )

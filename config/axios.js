@@ -13,14 +13,14 @@ axios.defaults.baseURL = 'http://localhost:8081'
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
-    // var token = localStorage.getItem("token");
-    var token = "sadgfadsfsdaf";
+    var token = localStorage.getItem("token");
+
     console.log(token)
-    if (token == null) {
-        window.location.href = "/login#/login";
-    } else {
+
+    if(token != null) {
         config.headers.token = token;
     }
+    
     // 在发送请求之前做些什么
     return config
 }, function (error) {
@@ -30,13 +30,24 @@ axios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 axios.interceptors.response.use(function (response) {
+    var token = localStorage.getItem("token");
+    if (token == null) {
+        console.log(123235)
+        this.$router.push("/login#/login");
+    }
     if (response.data.code == 200) {
+        console.log(response)
         response.type = "success"
         response.message = response.data.message;
         response.data = response.data.data;
     }else if(response.data.code == 666){
         response.type = "error"
         response.message = response.data.message;
+    }else if(response.data.code == 500){
+        response.type = "error"
+        response.message = response.data.message;
+        this.$router.push("/login#/login");
+        // window.location.href = "/login#/login";
     }
     return response
 }, function (error) {
