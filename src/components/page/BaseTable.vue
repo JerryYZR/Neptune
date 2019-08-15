@@ -12,7 +12,7 @@
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
             <el-table :data="corporationData" border style="width: 100%" ref="multipleTable">
-                <el-table-column align="center" width="55">
+                <el-table-column align="center" width="55" fixed="left">
                     <template slot-scope="scope">
                         <div>{{scope.$index+1}}</div>
                     </template>
@@ -27,7 +27,7 @@
                 </el-table-column>
                 <el-table-column prop="createTime" label="创建时间" align="center" width="291">
                 </el-table-column>
-                <el-table-column label="操作" align="center" width="250">
+                <el-table-column label="操作" align="center" width="180" fixed="right">
                     <template slot-scope="scope">
                         <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -35,23 +35,23 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination 
-                    @current-change="handleCurrentChange" 
-                    layout="prev, pager, next" 
-                    :page-size="pagesize" 
+                <el-pagination
+                    @current-change="handleCurrentChange"
+                    layout="prev, pager, next"
+                    :page-size="pagesize"
                     :total="corporationData.length">
                 </el-pagination>
             </div>
         </div>
 
         <!-- 添加弹出框 -->
-        <el-dialog title="添加组织" :visible.sync="addVisible" width="30%">
+        <el-dialog title="添加组织" :visible.sync="addVisible" width="35%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织名称">
                     <el-input v-model="form.orgName"></el-input>
                 </el-form-item>
                 <el-form-item label="组织类型">
-                    <el-select v-model="form.type" placeholder="请选择">
+                    <el-select v-model="form.type" placeholder="请选择" style="width: 300px">
                         <el-option key="总行" label="总行" value="总行"></el-option>
                         <el-option key="分行" label="分行" value="分行"></el-option>
                         <el-option key="行外" label="行外" value="行外"></el-option>
@@ -60,8 +60,8 @@
                 <el-form-item label="组织描述">
                     <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
                 </el-form-item>
-                <el-form-item label="审批人">
-                    <el-select v-model="form.auditor" placeholder="请选择">
+                <el-form-item label="审批人" >
+                    <el-select v-model="form.auditor" placeholder="请选择" style="width: 300px">
                         <el-option
                             v-for="(item,index) in masterData"
                             :key="index"
@@ -90,16 +90,18 @@
         </el-dialog>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑组织" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑组织" :visible.sync="editVisible" width="35%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
                     {{form.orgId}}
                 </el-form-item>
                 <el-form-item label="组织名称">
-                    <el-input v-model="form.orgName"></el-input>
+                    <el-col :span="12">
+                        <el-input v-model="form.orgName" style="width: 300px"></el-input>
+                    </el-col>
                 </el-form-item>
-                <el-form-item label="组织类型">
-                    <el-select v-model="form.type" placeholder="请选择">
+                <el-form-item label="组织类型" >
+                    <el-select v-model="form.type" placeholder="请选择" style="width: 300px">
                         <el-option key="总行" label="总行" value="总行"></el-option>
                         <el-option key="分行" label="分行" value="分行"></el-option>
                         <el-option key="行外" label="行外" value="行外"></el-option>
@@ -108,8 +110,8 @@
                 <el-form-item label="组织描述">
                     <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
                 </el-form-item>
-                <el-form-item label="审批人">
-                    <el-select v-model="form.auditor" placeholder="请选择">
+                <el-form-item label="审批人" >
+                    <el-select v-model="form.auditor" placeholder="请选择" style="width: 300px">
                         <el-option
                             v-for="(item,index) in masterData"
                             :key="index"
@@ -129,7 +131,7 @@
         </el-dialog>
 
         <!-- 删除弹出框 -->
-        <el-dialog title="删除组织" :visible.sync="delVisible" width="30%">
+        <el-dialog title="删除组织" :visible.sync="delVisible" width="35%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织编号">
                     {{form.orgId}}
@@ -141,7 +143,7 @@
                     {{form.orgDesc}}
                 </el-form-item>
                 <el-form-item label="审批人">
-                    <el-select v-model="form.auditor" placeholder="请选择">
+                    <el-select v-model="form.auditor" placeholder="请选择" style="width: 300px">
                         <el-option
                             v-for="(item,index) in masterData"
                             :key="index"

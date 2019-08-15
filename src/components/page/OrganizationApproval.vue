@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-tickets"></i> 组织管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-tickets"></i> 组织审批</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -16,7 +16,7 @@
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
             <el-table :data="applyData" border style="width: 100%" ref="multipleTable" >
-                <el-table-column align="center" width="55">
+                <el-table-column align="center" width="55" fixed="left">
                     <template slot-scope="scope">
                         <div>{{scope.$index+1}}</div>
                     </template>
@@ -38,26 +38,31 @@
                 </el-table-column>
                 <el-table-column prop="applyTime" label="创建时间" align="center" width="291">
                 </el-table-column>
-                <el-table-column label="操作" align="center" width="200">
+                <el-table-column label="操作" align="center" width="100" fixed="right">
                     <template slot-scope="scope">
                         <el-button v-show="applyData[scope.$index].state == 0" size="small" @click="handleEdit(scope.$index, scope.row)">审批</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination 
-                    @current-change="handleCurrentChange" 
-                    layout="prev, pager, next" 
-                    :page-size="pagesize" 
+                <el-pagination
+                    @current-change="handleCurrentChange"
+                    layout="prev, pager, next"
+                    :page-size="pagesize"
                     :total="applyData.length">
                 </el-pagination>
             </div>
         </div>
 
         <!-- 审批新增单 -->
-        <el-dialog title="审批新增单" :visible.sync="applyAddVisible" width="30%">
-            <el-button type="primary" icon="search" @click="deleteVisible = true">拒绝</el-button>
-            <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
+        <el-dialog title="审批新增单" :visible.sync="applyAddVisible" width="35%">
+            <div style="text-align: right">
+                <el-button type="danger" icon="search" @click="deleteVisible = true">拒绝</el-button>
+                <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
+            </div>
+            <template>
+                <el-divider>组织详情</el-divider>
+            </template>
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="组织名称">
                     {{form.orgName}}
@@ -68,6 +73,10 @@
                 <el-form-item label="组织描述">
                     <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
                 </el-form-item>
+
+                <template>
+                    <el-divider>申请单</el-divider>
+                </template>
 
                 <el-form-item label="申请单：">
                     {{form.orgApplyId}}
@@ -85,47 +94,80 @@
         </el-dialog>
 
         <!-- 审批修改单 -->
-        <el-dialog title="审批修改单" :visible.sync="applyEditVisible" width="30%">
-            <el-button type="primary" icon="search" @click="deleteVisible = true">拒绝</el-button>
-            <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
+        <el-dialog title="审批修改单" :visible.sync="applyEditVisible" width="55%">
+            <div style="text-align: right">
+                <el-button type="danger" icon="search" @click="deleteVisible = true">拒绝</el-button>
+                <el-button type="primary" icon="search" @click="editVisible = true">同意</el-button>
+            </div>
+
+            <template>
+                <el-divider>组织详情</el-divider>
+            </template>
             <el-form ref="form" :model="form" label-width="100px">
-                <el-form-item label="组织编号">
-                    {{form.orgId}}
-                </el-form-item>
-                <el-form-item label="组织名称">
-                    {{form.oldOrgName}}
-                </el-form-item>
-                <el-form-item label="组织类型">
-                    {{form.oldOrgType}}
-                </el-form-item>
-                <el-form-item label="组织描述">
-                    <el-input type="textarea" rows="5" v-model="form.oldOrgDesc"></el-input>
-                </el-form-item>
 
-                <el-form-item label="组织编号">
-                    {{form.orgId}}
-                </el-form-item>
-                <el-form-item label="组织名称">
-                    {{form.orgName}}
-                </el-form-item>
-                <el-form-item label="组织类型">
-                    {{form.type}}
-                </el-form-item>
-                <el-form-item label="组织描述">
-                    <el-input type="textarea" rows="5" v-model="form.orgDesc"></el-input>
-                </el-form-item>
+                <el-row type="flex" class="row-bg" justify="center">
+                    <el-col :span="13">
+                        <el-row>
+                            <el-form-item label="组织编号">
+                                {{form.orgId}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织名称">
+                                {{form.oldOrgName}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织类型">
+                                {{form.oldOrgType}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织描述">
+                                <el-input type="textarea" rows="5" v-model="form.oldOrgDesc"></el-input>
+                            </el-form-item>
+                        </el-row>
+                    </el-col>
+                    <el-col :span="13">
+                        <el-row>
+                            <el-form-item label="组织编号">
+                                {{form.orgId}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织名称">
+                                {{form.orgName}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织类型">
+                                {{form.type}}
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item label="组织描述">
+                                <el-input type="textarea" rows="5" v-model="form.orgDesc"  ></el-input>
+                            </el-form-item>
+                        </el-row>
+                    </el-col>
+                </el-row>
 
-                <el-form-item label="申请单：">
+
+                <template>
+                    <el-divider>申请单</el-divider>
+                </template>
+
+                <el-form-item label="申请单">
                     {{form.orgApplyId}}
                 </el-form-item>
-                <el-form-item label="申请人：">
+                <el-form-item label="申请人">
                     {{form.applyPerson}}
                 </el-form-item>
-                <el-form-item label="申请时间：">
+                <el-form-item label="申请时间">
                     {{form.applyTime}}
                 </el-form-item>
                 <el-form-item label="申请描述">
-                    <el-input type="textarea" rows="5" v-model="form.applyDesc"></el-input>
+                    <el-input type="textarea" rows="5" v-model="form.applyDesc" ></el-input>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -152,8 +194,11 @@
 
 <script>
 import convert_FormData_to_json2 from "../page/other";
+import ElCol from "element-ui/packages/col/src/col";
+
 export default {
-  inject: ["reload"],
+    components: {ElCol},
+    inject: ["reload"],
   name: "basetable",
   data() {
     return {
