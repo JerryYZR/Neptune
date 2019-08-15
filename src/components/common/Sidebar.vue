@@ -58,17 +58,9 @@ export default {
           title: "运维故障单管理",
           subs: [
             {
-              index: "editor",
+              index: "faultApply",
               title: "故障报备"
             }
-            //                            {
-            //                                index: 'markdown',
-            //                                title: 'markdown编辑器'
-            //                            },
-            //                            {
-            //                                index: 'upload',
-            //                                title: '文件上传'
-            //                            }
           ]
         },
         {
@@ -102,7 +94,7 @@ export default {
         this.items[1].subs.push(temp);
 
         let temp1 = {
-          index: "form",
+          index: "faultDeal",
           title: "故障处理"
         };
         this.items[3].subs.push(temp1);

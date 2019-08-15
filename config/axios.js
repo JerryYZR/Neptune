@@ -20,7 +20,7 @@ axios.interceptors.request.use(function (config) {
     if(token != null) {
         config.headers.token = token;
     }
-    
+
     // 在发送请求之前做些什么
     return config
 }, function (error) {
@@ -33,7 +33,7 @@ axios.interceptors.response.use(function (response) {
     var token = localStorage.getItem("token");
     if (token == null) {
         console.log(123235)
-        this.$router.push("/login#/login");
+        // this.$router.push("/login#/login");
     }
     if (response.data.code == 200) {
         console.log(response)

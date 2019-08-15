@@ -98,7 +98,8 @@ export default {
             localStorage.setItem("role", response.data.roles);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem('ms_username',this.ruleForm.username);
-            this.$router.push("/");
+              this.$router.push("/");
+
           } else {
             this.$message({
               type: "error",

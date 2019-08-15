@@ -3,7 +3,7 @@
         <div class="container">
             <div class="handle-box">
                 <template>
-                    <el-select v-model="value1" placeholder="应用">
+                    <el-select v-model="applicationValue" placeholder="应用">
                         <el-option
                             v-for="item in applicationOptions"
                             :key="item.value"
@@ -12,7 +12,7 @@
                         </el-option>
                     </el-select>
                     <el-select
-                        v-model="value2"
+                        v-model="statusValue"
                         collapse-tags
                         placeholder="状态">
                         <el-option
@@ -27,9 +27,9 @@
                 <el-button icon="el-icon-search"  @click="search" type="info"></el-button>
             </div>
             <el-table
-                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :data="tableData"
                 :row-class-name="tableRowClassName"
-                @row-click="rollClick"
+                @row-click="showDetail"
                 @click.stop ="true"
                 border
                 style="width: 100%">
@@ -71,7 +71,7 @@
                     label="操作"
                     width="100">
                     <template slot-scope="scope">
-                        <el-button  @click.stop="deal" type="text" size="small" >处理</el-button>
+                        <el-button  @click.stop="openDealDialog(scope.$index)" type="text" size="small" >处理</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -124,13 +124,13 @@
                     <el-divider>操作日志</el-divider>
                     <template >
                         <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
-                            <el-step  icon="el-icon-s-help" v-for="(item,i) in faultList" :key="item.id" :description="item.name+' '+item.time+' '+item.reason"></el-step>
+                            <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.remarks+'  '+item.time"></el-step>
                         </el-steps>
                     </template>
                 </template>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="dealDialog = false">取 消</el-button>
-                    <el-button type="primary" @click="dealDialog = false">确 定</el-button>
+                    <el-button type="primary" @click="handleDealDialogClose">确 定</el-button>
                 </span>
             </el-dialog>
 
@@ -161,7 +161,7 @@
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content">联系人</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkman}}</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkMan}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content ">联系方式</div></el-col>
@@ -172,7 +172,7 @@
                     <el-divider>操作日志</el-divider>
                         <template >
                             <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
-                                <el-step  icon="el-icon-s-help" v-for="(item,i) in faultList" :key="item.id" :description="item.name+' '+item.time+' '+ item.reason"></el-step>
+                                <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.remarks+'  '+item.time"></el-step>
                             </el-steps>
                         </template>
                 </template>
@@ -189,7 +189,7 @@
                     layout="prev, pager, next"
                     :total='total'
                     :page-size="pageSize"
-                    @current-change="current_change">
+                    @current-change="currentChange">
                 </el-pagination>
             </div>
 
@@ -203,203 +203,187 @@
         name: 'baseform',
         data: function(){
             return {
-                tableData: [
-                    {
-                       faultTitle:'首页报错1',
-                       status:'状态1',
-                       faultApplication:'F-ABC',
-                       linkman:'某某1',
-                       linkPhone:'18557131766',
-                       createdTime:'2019-08-07 16:30:00',
-                       content:'这是一个报错啦啦啦'
-                    },
-                    {
-                        faultTitle:'首页报错2',
-                        status:'状态2',
-                        faultApplication:'F-ABC',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00',
-                        content:'这是一个报错啦啦啦'
-                    },
-                    {
-                        faultTitle:'首页报错3',
-                        status:'状态3',
-                        faultApplication:'F-ABC',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00',
-                        content:'这是一个报错啦啦啦'
-
-                    },
-                    {
-                        faultTitle:'首页报错4',
-                        status:'状态4',
-                        faultApplication:'F-ABC',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00',
-                        content:'这是一个报错啦啦啦'
-                    },
-                ],
+                //分页相关
                 total:4,
-                pageSize:2,
+                pageSize:10,
                 currentPage:1,
+
+
+
+                //条件筛选
+                applicationValue: '',
+                statusValue:'',
                 selectWord: "",
                 applicationOptions: [{
-                    value: 'F-ABC',
+                    value: '0',
                     label: 'F-ABC'
                 }, {
-                    value: 'F-CDE',
+                    value: '1',
                     label: 'F-CDE'
                 }],
                 statusOptions:[
                     {
-                        value: '已处理',
+                        value: '0',
                         label: '已处理'
                     }, {
-                        value: '未处理',
+                        value: '1',
                         label: '未处理'
                     }
                 ],
-                value1: '',
-                value2: '',
-                index:-1,
+
+
+                //表格
+                tableData:[],
+
+
+                //查看报备单详情
                 choosedRow:{},
                 showDialog: false,
+                faultJournal:[],
+
+                //处理报备单
                 dealDialog:false,
                 ruleForm:{
-                 dealResult:''
+                    dealResult:''
                 },
-                faultList:[
-                    {
-                        id:1,
-                        name:'1号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:2,
-                        name:'2号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:3,
-                        name:'3号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    }
-                ]
+
+
+                index:-1,
+
             }
         },
         created() {
             this.getData();
         },
         methods: {
-            onSubmit() {
-                this.$message.success('提交成功！');
+            //获取表单初始数据
+            getData() {
+                this.$axios
+                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
+                    .then(response=>{
+                            if (response.status === 200) {
+//                                const responseData = response.data.records;
+//                                responseData.forEach(item =>{
+//                                    if(item)
+//                                })
+                                this.tableData = response.data.records;
+                                console.log(this.tableData);
+                            }
+                        }
+                    );
             },
 
-//          页码修改
-            current_change(currentPage){
+
+            //分页跳转
+            currentChange(currentPage){
                 console.log('现在所在的页',currentPage);
-                console.log('现在所在的页',this.tableData.slice((currentPage-1)*this.pageSize,currentPage*this.pageSize));
                 this.currentPage = currentPage;
-//                this.$axios
-//                    .post("/ticket",{
-//                        current:currentPage
-//                    })
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                    });
+                this.getData();
             },
 
-//          根据条件搜索
+            //根据条件搜索
             search(){
-                console.log(this.value1);
-                console.log(this.value2);
-                console.log(this.selectWord);
-//                var url= '';
-//                var requestHead = {
-//                    value1:this.value1,
-//                    value1:this.value2,
-//                    selectWord:this.selectWord
-//                }
-//                this.$axios
-//                    .post(url,requestHead)
-//                    .then(function (response) {
-//                        console.log(response);
-//                    })
-//                    .catch(function (error) {
-//                        console.log(error);
-//                    });
+                console.log(this.applicationValue+','+this.statusValue+','+this.selectWord);
+                this.getData();
             },
 
-//          点击某一行跳出查看弹框
-            rollClick(row){
-                console.log('被点击的行',this.tableData[row.index]);
-                this.choosedRow = this.tableData[row.index];
-//                this.choosedRow =   this.$axios
-//                    .post(url,{
-//                        rowIndex:row.index
-//                    })
+
+            //查看单个报备单详细信息
+            showDetail(row){
+                console.log('查看报备单详情：被点击的行',this.tableData[row.index]);
+                const rowData = this.tableData[row.index];
+                this.choosedRow = rowData;
+                this.faultJournal = [
+                    {
+                        time:rowData.createdTime,
+                        remarks:'故障产生'
+                    },
+                    {
+                        time:rowData.submitedTime,
+                        remarks:'故障表单产生'
+                    }
+                ];
+                if(rowData.handledTime !== null){
+                    this.faultJournal.push({
+                        time:rowData.handledTime,
+                        remarks:'故障表单结束'
+                    })
+                }
+
+
+//                this.$axios
+//                    .get('/api/api/faultInfo/'+this.choosedRow.faultId)
 //                    .then(function (response) {
-//                        alert('success!')
+//                        console.log('单行结果',response);
 //                    });
 
                 this.showDialog = true;
 
             },
-
             tableRowClassName ({row, rowIndex}) {
                 //把每一行的索引放进row
                 row.index = rowIndex;
             },
 
+
+            //处理报备单提交
+            openDealDialog(index){
+                this.dealDialog = true;
+                console.log('处理报备单：被点击这一行的序号',index);
+                const rowData = this.tableData[index];
+                console.log('rowData',rowData);
+                this.choosedRow = rowData;
+                this.faultJournal = [
+                    {
+                        time:rowData.createdTime,
+                        remarks:'故障产生'
+                    },
+                    {
+                        time:rowData.submitedTime,
+                        remarks:'故障表单产生'
+                    }
+                ];
+                if(rowData.handledTime !== null){
+                    this.faultJournal.push({
+                        time:rowData.handledTime,
+                        remarks:'故障表单结束'
+                    })
+                }
+            },
+            submitForm(formName) {
+                var result = this.ruleForm.dealResult;
+                var faultId = this.choosedRow.faultId;
+                console.log('result',result);
+                console.log('被提交的这条记录信息：',this.choosedRow);
+                this.$axios
+                    .post('/api/api/faultInfoHandle',{
+                        faultId:faultId,
+                        result:result
+                    })
+                    .then(function (response) {
+                        alert('success!')
+                    });
+
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+
+
+
+            //处理对话框的关闭
+            handleDealDialogClose(){
+                this.getData();
+                this.dealDialog = false;
+            },
             handleClose(done) {
                 this.$confirm('确认关闭？')
                     .then(_ => {
                         done();
                     })
                     .catch(_ => {});
-            },
-
-            deal(){
-                console.log('点击按钮');
-                this.dealDialog = true
-            },
-
-//            提交处理结果
-            submitForm(formName) {
-//                var result = this.ruleForm.dealResult;
-//                this.$axios
-//                    .post(url,{
-//                        result:result
-//                    })
-//                    .then(function (response) {
-//                        alert('success!')
-//                    });
-
-            },
-
-//            表单重置
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
-            },
-
-//          获取表单初始数据
-            getData() {
-//                this.$axios
-//                    .post("/ticket")
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                        this.total = response.total;
-//                    });
-            },
-
+            }
         }
     }
 </script>

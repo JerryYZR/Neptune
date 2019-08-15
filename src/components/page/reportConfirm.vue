@@ -134,7 +134,7 @@
                     layout="prev, pager, next"
                     :total='total'
                     :page-size="pageSize"
-                    @current-change="current_change">
+                    @current-change="currentChange">
                 </el-pagination>
             </div>
 
@@ -242,7 +242,7 @@
 
 
             //页码修改
-            current_change(currentPage){
+            currentChange(currentPage){
                 console.log('现在所在的页',currentPage);
                 console.log('现在所在的页',this.tableData.slice((currentPage-1)*this.pageSize,currentPage*this.pageSize));
                 this.currentPage = currentPage;
