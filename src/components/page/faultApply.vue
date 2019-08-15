@@ -130,8 +130,8 @@
                     </el-form-item>
                     <el-form-item label="故障应用" :label-width="formLabelWidth" prop="faultApplication">
                         <el-select v-model="addForm.faultApplication" placeholder="请选择故障应用" style="width:250px">
-                            <el-option label="故障1" value="faultOne"></el-option>
-                            <el-option label="故障2" value="faultTwo"></el-option>
+                            <el-option label="故障1" value="0"></el-option>
+                            <el-option label="故障2" value="1"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="故障时间" :label-width="formLabelWidth" prop="createdTime">
@@ -238,38 +238,8 @@
                 ],
 
 
-                //表格
-//                tableData: [],
-                tableData: [
-                    {
-                        title:'首页报错1',
-                        status:'状态1',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00'
-                    },
-                    {
-                        title:'首页报错1',
-                        status:'状态1',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00'
-                    },
-                    {
-                        title:'首页报错1',
-                        status:'状态1',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00'
-                    },
-                    {
-                        title:'首页报错1',
-                        status:'状态1',
-                        linkman:'某某1',
-                        linkPhone:'18557131766',
-                        createdTime:'2019-08-07 16:30:00'
-                    }
-                ],
+//                表格
+                tableData: [],
 
 
 
@@ -313,7 +283,7 @@
             //获取表单初始数据
             getData() {
                 this.$axios
-                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
+                    .get("/api/api/userfaultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
                     .then(response=>{
                             if (response.status === 200) {
                                 this.tableData = response.data.records;
@@ -334,15 +304,16 @@
             //添加故障单
             addRecord(){
                 console.log(this.addForm);
-//                const formData = this.addForm;
-//                this.$axios
-//                    .get("/api/api/faultInfoSub",formData)
-//                    .then(response=>{
-//                            if (response.status === 200) {
-//                                this.addDialog = false;
-//                            }
-//                        }
-//                    );
+                const formData = this.addForm;
+                this.$axios
+                    .post("/api/api/faultInfoSub",formData)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                this.getData();
+                                this.addDialog = false;
+                            }
+                        }
+                    );
                 this.addDialog = false;
                 console.log('确认上报');
             },

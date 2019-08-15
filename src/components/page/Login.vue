@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrap">
-        <div class="ms-title">后台管理系统</div>
+        <div class="ms-title">Team7天王星系统</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="username">
@@ -86,8 +86,7 @@ export default {
 
       let config = {
         headers: {
-          "Content-Type": "application/json",
-          "token": localStorage.getItem("token")
+          "Content-Type": "application/json"
         }
       };
 
@@ -95,11 +94,11 @@ export default {
         .post("/api/login", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
-              console.log(1123123123);
-              this.$router.push("/");
-
+            console.log(response)
+            localStorage.setItem("role", response.data.roles);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem('ms_username',this.ruleForm.username);
+              this.$router.push("/");
 
           } else {
             this.$message({

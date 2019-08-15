@@ -6,25 +6,39 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="user-info">
-                <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="search" @click="search">搜索</el-button>
+            <div class="">
+                <!-- <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
+
+                <el-button type="primary" icon="search" @click="search">搜索</el-button> -->
+                <el-autocomplete
+                   class="inline-input"
+                   v-model="select_word"
+                   :fetch-suggestions="search"
+                   @select="handleSearch"
+                   placeholder="请输入身份证号/姓名/部门"
+                   :trigger-on-focus="false">
+                </el-autocomplete>
+                <el-button @click="search">搜索</el-button>
             </div>
 
             <div>
-                {{InfoData.nickname}}
-                {{InfoData.postion}}
-                {{InfoData.department}}
-                {{InfoData.departmentName}}
-                账号：{{InfoData.userName}}
-                电话：{{InfoData.telephone}}
-                邮箱：{{InfoData.email}}
-                办公地址：{{InfoData.office}}
+                {{infoData.nickname}}
+                {{infoData.postion}}
+                {{infoData.department}}
+                {{infoData.departmentName}}
+                账号：{{infoData.userName}}
+                电话：{{infoData.telephone}}
+                邮箱：{{infoData.email}}
+                办公地址：{{infoData.office}}
             </div>
 
             <div>
                 角色
-                <p v-bind:v-for="(item, i) in masterData"></p>
+                <ol>
+                   <li v-for="site in masterData">
+                      {{ site.roleName }}
+                   </li>
+                </ol>
                 <img src="/static/img/add.png" @click="roleVisible = true">
             </div>
         </div>
@@ -81,7 +95,8 @@ export default {
       deleteVisible: false,
       addVisible: false,
       roleVisible: false,
-      InfoData: [],
+      tempData: [],
+      infoData: [],
       masterData: [],
       roleData: [],
       form: {},
@@ -92,11 +107,12 @@ export default {
   created() {
     this.getData();
   },
-  watch: {
-      select_word:function (){
-          this.search();
-      }
-  },
+  //   watch: {
+  //     select_word: function() {
+  //       console.log(this.select_word);
+  //       this.search();
+  //     }
+  //   },
   methods: {
     // 分页导航
     handleCurrentChange(val) {
@@ -107,29 +123,15 @@ export default {
     getData() {
       let config = {
         headers: {
-          "token": localStorage.getItem("token")
+          token: localStorage.getItem("token")
         }
       };
 
-      this.$axios
-        .get(
-          "/api/api/orgInfo?pageNum=" +
-            this.cur_page +
-            "&orgName=" +
-            this.select_word,
-            config
-        )
-        .then(response => {
-          if (response.status === 200) {
-            this.corporationData = response.data.records;
-            console.log(1);
-            console.log(this.corporationData);
-          }
-        });
-
       this.$axios.get("/api/api/role", config).then(response => {
         if (response.status === 200) {
+          console.log(response);
           this.roleData = response.data;
+          console.log(1);
           console.log(this.roleData);
         }
       });
@@ -137,39 +139,64 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    search() {
+    search(queryString, cb) {
+      let formData = new FormData();
+
+      formData.append("userName", this.select_word);
       let config = {
         headers: {
-          "token": localStorage.getItem("token")
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token")
         }
       };
 
       this.$axios
-        .get(
-          "/api/api/orgInfo?pageNum=" +
-            this.cur_page +
-            "&orgName=" +
-            this.select_word,
-            config
-        )
+        .post("/api/api/reaRole", convert_FormData_to_json2(formData), config)
         .then(response => {
           if (response.status === 200) {
-            this.corporationData = response.data.records;
+            this.tempData = response.data;
             console.log(1);
-            console.log(this.corporationData);
+            console.log(this.tempData);
+            for (var i = 0; i < this.tempData.length; i++) {
+              this.tempData[i].value = this.tempData[i].userName;
+            }
+            cb(this.tempData);
           }
         });
+    },
+    handleSearch(data) {
+      console.log(data);
+      this.getRole(data);
+    },
+    getRole(item) {
+      let config = {
+        headers: {
+          token: localStorage.getItem("token")
+        }
+      };
+
+      this.$axios
+        .get("/api/api/otherRole/" + item.userId, config)
+        .then(response => {
+          if (response.status === 200) {
+            this.infoData = response.data;
+            this.masterData = this.infoData.roleInfoList;
+            console.log(this.infoData);
+          }
+        });
+
+       
     },
     submitAdd() {
       let formData = new FormData();
 
-      formData.append("userId", this.InfoData.userId);
+      formData.append("userId", this.infoData.userId);
       formData.append("roleId", "");
 
       let config = {
         headers: {
           "Content-Type": "application/json",
-          "token": localStorage.getItem("token")
+          token: localStorage.getItem("token")
         }
       };
       for (item in multipleSelection) {
@@ -202,18 +229,22 @@ export default {
     submitDelete() {
       let formData = new FormData();
 
-      formData.append("userId", this.InfoData.userId);
+      formData.append("userId", this.infoData.userId);
       formData.append("roleId", this.form.roleId);
 
       let config = {
         headers: {
           "Content-Type": "application/json",
-          "token": localStorage.getItem("token")
+          token: localStorage.getItem("token")
         }
       };
 
       this.$axios
-        .delete("/api/api/admin/delete", convert_FormData_to_json2(formData), config)
+        .delete(
+          "/api/api/admin/delete",
+          convert_FormData_to_json2(formData),
+          config
+        )
         .then(response => {
           if (response.status === 200) {
             this.$message({
@@ -238,6 +269,15 @@ export default {
 
 
 <style scoped>
+.searchbox {
+  display: inline-block;
+  width: 250px;
+}
+.searchbox.el-select,
+.el-autocomplete {
+  float: left;
+}
+
 .el-row {
   margin-bottom: 20px;
 }

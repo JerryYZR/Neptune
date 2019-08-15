@@ -71,7 +71,7 @@
                     label="操作"
                     width="100">
                     <template slot-scope="scope">
-                        <el-button  @click.stop="dealDialog=true" type="text" size="small" >处理</el-button>
+                        <el-button  @click.stop="openDealDialog(scope.$index)" type="text" size="small" >处理</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -124,13 +124,13 @@
                     <el-divider>操作日志</el-divider>
                     <template >
                         <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
-                            <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.name+' '+item.time+' '+item.reason"></el-step>
+                            <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.remarks+'  '+item.time"></el-step>
                         </el-steps>
                     </template>
                 </template>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="dealDialog = false">取 消</el-button>
-                    <el-button type="primary" @click="dealDialog = false">确 定</el-button>
+                    <el-button type="primary" @click="handleDealDialogClose">确 定</el-button>
                 </span>
             </el-dialog>
 
@@ -172,7 +172,7 @@
                     <el-divider>操作日志</el-divider>
                         <template >
                             <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
-                                <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.name+' '+item.time+' '+ item.reason"></el-step>
+                                <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.remarks+'  '+item.time"></el-step>
                             </el-steps>
                         </template>
                 </template>
@@ -239,26 +239,7 @@
                 //查看报备单详情
                 choosedRow:{},
                 showDialog: false,
-                faultJournal:[
-                    {
-                        id:1,
-                        name:'1号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:2,
-                        name:'2号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:3,
-                        name:'3号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    }
-                ],
+                faultJournal:[],
 
                 //处理报备单
                 dealDialog:false,
@@ -278,9 +259,13 @@
             //获取表单初始数据
             getData() {
                 this.$axios
-                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.value2+'&faultApplication='+this.value1+'&faultTitle='+this.selectWord)
+                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
                     .then(response=>{
                             if (response.status === 200) {
+//                                const responseData = response.data.records;
+//                                responseData.forEach(item =>{
+//                                    if(item)
+//                                })
                                 this.tableData = response.data.records;
                                 console.log(this.tableData);
                             }
@@ -305,8 +290,27 @@
 
             //查看单个报备单详细信息
             showDetail(row){
-                console.log('被点击的行',this.tableData[row.index]);
-                this.choosedRow = this.tableData[row.index];
+                console.log('查看报备单详情：被点击的行',this.tableData[row.index]);
+                const rowData = this.tableData[row.index];
+                this.choosedRow = rowData;
+                this.faultJournal = [
+                    {
+                        time:rowData.createdTime,
+                        remarks:'故障产生'
+                    },
+                    {
+                        time:rowData.submitedTime,
+                        remarks:'故障表单产生'
+                    }
+                ];
+                if(rowData.handledTime !== null){
+                    this.faultJournal.push({
+                        time:rowData.handledTime,
+                        remarks:'故障表单结束'
+                    })
+                }
+
+
 //                this.$axios
 //                    .get('/api/api/faultInfo/'+this.choosedRow.faultId)
 //                    .then(function (response) {
@@ -323,16 +327,42 @@
 
 
             //处理报备单提交
+            openDealDialog(index){
+                this.dealDialog = true;
+                console.log('处理报备单：被点击这一行的序号',index);
+                const rowData = this.tableData[index];
+                console.log('rowData',rowData);
+                this.choosedRow = rowData;
+                this.faultJournal = [
+                    {
+                        time:rowData.createdTime,
+                        remarks:'故障产生'
+                    },
+                    {
+                        time:rowData.submitedTime,
+                        remarks:'故障表单产生'
+                    }
+                ];
+                if(rowData.handledTime !== null){
+                    this.faultJournal.push({
+                        time:rowData.handledTime,
+                        remarks:'故障表单结束'
+                    })
+                }
+            },
             submitForm(formName) {
                 var result = this.ruleForm.dealResult;
-                console.log(result);
-//                this.$axios
-//                    .post('/api/api/faultInfoHandle',{
-//                        faultId:result
-//                    })
-//                    .then(function (response) {
-//                        alert('success!')
-//                    });
+                var faultId = this.choosedRow.faultId;
+                console.log('result',result);
+                console.log('被提交的这条记录信息：',this.choosedRow);
+                this.$axios
+                    .post('/api/api/faultInfoHandle',{
+                        faultId:faultId,
+                        result:result
+                    })
+                    .then(function (response) {
+                        alert('success!')
+                    });
 
             },
             resetForm(formName) {
@@ -343,6 +373,10 @@
 
 
             //处理对话框的关闭
+            handleDealDialogClose(){
+                this.getData();
+                this.dealDialog = false;
+            },
             handleClose(done) {
                 this.$confirm('确认关闭？')
                     .then(_ => {
