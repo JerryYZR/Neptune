@@ -59,8 +59,8 @@
                         </el-col>
                     </el-row>
                 </el-card>
-                <el-card shadow="hover" :body-style="{ height: '500px'}">
-                    <div id="myChart" :style="{width: '800px', height: '500px'}"></div>
+                <el-card shadow="hover" :body-style="{ width: '100%', height: '500px'}">
+                    <div id="myChart" :style="{width: '100%', height: '500px'}"></div>
                 </el-card>
 
             </el-col>

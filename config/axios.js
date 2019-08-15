@@ -38,17 +38,17 @@ axios.interceptors.response.use(function (response) {
     if (response.data.code == 200) {
         console.log(response)
         response.type = "success"
-        response.message = response.data.message;
         response.data = response.data.data;
     }else if(response.data.code == 666){
         response.type = "error"
-        response.message = response.data.message;
     }else if(response.data.code == 670){
         response.type = "error"
-        response.message = response.data.message;
         this.$router.push("/login#/login");
         // window.location.href = "/login#/login";
+    }else{
+        response.type = "error"
     }
+    response.message = response.data.message;
     return response
 }, function (error) {
     // 对响应错误做点什么
