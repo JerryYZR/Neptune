@@ -7,9 +7,6 @@
         </div>
         <div class="container">
             <div class="">
-                <!-- <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-
-                <el-button type="primary" icon="search" @click="search">搜索</el-button> -->
                 <el-autocomplete
                    class="inline-input"
                    v-model="select_word"
@@ -18,7 +15,6 @@
                    placeholder="请输入身份证号/姓名/部门"
                    :trigger-on-focus="false">
                 </el-autocomplete>
-                <el-button @click="search">搜索</el-button>
             </div>
 
             <div>
@@ -37,6 +33,7 @@
                 <ol>
                    <li v-for="site in masterData">
                       {{ site.roleName }}
+                      <img src="/static/img/delete.png" @click="handleDelete(site)">
                    </li>
                 </ol>
                 <img src="/static/img/add.png" @click="roleVisible = true">
@@ -107,12 +104,6 @@ export default {
   created() {
     this.getData();
   },
-  //   watch: {
-  //     select_word: function() {
-  //       console.log(this.select_word);
-  //       this.search();
-  //     }
-  //   },
   methods: {
     // 分页导航
     handleCurrentChange(val) {
@@ -168,6 +159,11 @@ export default {
       console.log(data);
       this.getRole(data);
     },
+    handleDelete(data) {
+      console.log(data);
+      this.form.roleId = data.roleId;
+      this.deleteVisible = true;
+    },
     getRole(item) {
       let config = {
         headers: {
@@ -184,8 +180,23 @@ export default {
             console.log(this.infoData);
           }
         });
+    },
+    getInfo() {
+      let config = {
+        headers: {
+          token: localStorage.getItem("token")
+        }
+      };
 
-       
+      this.$axios
+        .get("/api/api/otherRole/" + this.infoData.userId, config)
+        .then(response => {
+          if (response.status === 200) {
+            this.infoData = response.data;
+            this.masterData = this.infoData.roleInfoList;
+            console.log(this.infoData);
+          }
+        });
     },
     submitAdd() {
       let formData = new FormData();
@@ -199,11 +210,13 @@ export default {
           token: localStorage.getItem("token")
         }
       };
-      for (item in multipleSelection) {
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        let item = this.multipleSelection[i];
+        console.log(item);
         formData.set("roleId", item.roleId);
         this.$axios
           .post(
-            "/api/api/orgApply",
+            "/api/api/admin/addRole",
             convert_FormData_to_json2(formData),
             config
           )
@@ -215,34 +228,25 @@ export default {
               });
               this.roleVisible = false;
               this.addVisible = false;
-              this.reload();
-            } else {
-              this.$message({
-                type: "error",
-                message: response.message
-              });
-              this.addVisible = false;
+
+              this.getInfo();
             }
           });
       }
     },
     submitDelete() {
-      let formData = new FormData();
-
-      formData.append("userId", this.infoData.userId);
-      formData.append("roleId", this.form.roleId);
-
       let config = {
         headers: {
-          "Content-Type": "application/json",
           token: localStorage.getItem("token")
         }
       };
 
       this.$axios
         .delete(
-          "/api/api/admin/delete",
-          convert_FormData_to_json2(formData),
+          "/api/api/admin/delRole/" +
+            this.infoData.userId +
+            "/" +
+            this.form.roleId,
           config
         )
         .then(response => {
@@ -252,13 +256,8 @@ export default {
               message: response.message
             });
             this.deleteVisible = false;
-            this.reload();
-          } else {
-            this.$message({
-              type: "error",
-              message: response.message
-            });
-            this.deleteVisible = false;
+            
+            this.getInfo();
           }
         });
     }
