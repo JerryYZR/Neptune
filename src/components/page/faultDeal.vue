@@ -259,7 +259,7 @@
             //获取表单初始数据
             getData() {
                 this.$axios
-                    .get("/api/api/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
+                    .get("/api/api/admin/faultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
                     .then(response=>{
                             if (response.status === 200) {
 //                                const responseData = response.data.records;
@@ -309,14 +309,6 @@
                         remarks:'故障表单结束'
                     })
                 }
-
-
-//                this.$axios
-//                    .get('/api/api/faultInfo/'+this.choosedRow.faultId)
-//                    .then(function (response) {
-//                        console.log('单行结果',response);
-//                    });
-
                 this.showDialog = true;
 
             },

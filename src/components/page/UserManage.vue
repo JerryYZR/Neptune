@@ -6,39 +6,111 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="">
-                <el-autocomplete
-                   class="inline-input"
-                   v-model="select_word"
-                   :fetch-suggestions="search"
-                   @select="handleSearch"
-                   placeholder="请输入身份证号/姓名/部门"
-                   :trigger-on-focus="false">
-                </el-autocomplete>
+
+            <template>
+                <el-row style="text-align: center">
+                    <el-autocomplete
+                        style="width:50%"
+                        v-model="select_word"
+                        :fetch-suggestions="search"
+                        @select="handleSearch"
+                        placeholder="请输入身份证号/姓名/部门"
+                        :trigger-on-focus="false">
+                        <template slot="prepend"><i class="el-icon-search"></i></template>
+                    </el-autocomplete>
+                </el-row>
+            </template>
+
+            <div v-if="infoData!='' ">
+                <template>
+                    <el-divider></el-divider>
+                </template>
+
+                <div style="margin-left: 50px;">
+                    <template >
+                        <el-row>
+                            <el-col :span="3" style="font-size: 20px;font-weight: bold;">
+                                <!--nickname-->
+                                {{infoData.nickname}}
+                            </el-col>
+                            <el-col :span="3">
+                                <!--position-->
+                                {{infoData.postion}}
+                            </el-col>
+                        </el-row>
+                        <el-row >
+                            <el-col :span="3" style="font-weight: bold">
+                                <!--department-->
+                                {{infoData.department}}
+                            </el-col>
+                            <el-col :span="3">
+                                <!--departmentName-->
+                                {{infoData.departmentName}}
+                            </el-col>
+                        </el-row>
+                    </template>
+                </div>
+
+
+                <template>
+                    <el-divider></el-divider>
+                </template>
+
+                <div>
+                    <el-row>
+                        <div style="margin-left: 50px;">
+                            <div>
+                                <i class="el-icon-user-solid"></i>
+                                账号：{{infoData.userName}}
+                            </div>
+                            <div>
+                                <i class="el-icon-phone"></i>
+                                电话：{{infoData.telephone}}
+                            </div>
+                            <div>
+                                <i class="el-icon-receiving"></i>
+                                邮箱：{{infoData.email}}
+                            </div>
+                            <div>
+                                <i class="el-icon-location"></i>
+                                办公地址：{{infoData.office}}
+                            </div>
+                        </div>
+                    </el-row>
+                </div>
+
+                <template>
+                    <el-divider></el-divider>
+                </template>
+
+                <div style="margin-left: 50px;">
+                    <el-row>
+                        <el-col :span="3">
+                            <i class="el-icon-s-custom"></i>
+                            角色:
+                        </el-col>
+                        <el-col :span="3">
+                            <ol>
+                                <li v-for="site in masterData">
+                                    {{ site.roleName }}
+                                    <i class="el-icon-delete" @click="handleDelete(site)" style="color: red;font-size: 20px"></i>
+                                </li>
+                            </ol>
+                        </el-col>
+                        <el-col :span="6">
+                            <img src="/static/img/add.png" @click="roleVisible = true" style="width: 60px;margin-top: -10px;">
+                        </el-col>
+                    </el-row>
+                </div>
             </div>
 
-            <div>
-                {{infoData.nickname}}
-                {{infoData.postion}}
-                {{infoData.department}}
-                {{infoData.departmentName}}
-                账号：{{infoData.userName}}
-                电话：{{infoData.telephone}}
-                邮箱：{{infoData.email}}
-                办公地址：{{infoData.office}}
-            </div>
 
-            <div>
-                角色
-                <ol>
-                   <li v-for="site in masterData">
-                      {{ site.roleName }}
-                      <img src="/static/img/delete.png" @click="handleDelete(site)">
-                   </li>
-                </ol>
-                <img src="/static/img/add.png" @click="roleVisible = true">
-            </div>
+
         </div>
+
+
+
+
 
         <!-- 添加角色弹出框 -->
         <el-dialog title="添加角色" :visible.sync="roleVisible" width="50%">
@@ -79,8 +151,10 @@
 
 <script>
 import convert_FormData_to_json2 from "../page/other";
+import ElCol from "element-ui/packages/col/src/col";
 export default {
-  inject: ["reload"],
+    components: {ElCol},
+    inject: ["reload"],
   name: "basetable",
   data() {
     return {
@@ -93,7 +167,7 @@ export default {
       addVisible: false,
       roleVisible: false,
       tempData: [],
-      infoData: [],
+      infoData: '',
       masterData: [],
       roleData: [],
       form: {},
@@ -124,6 +198,9 @@ export default {
           this.roleData = response.data;
           console.log(1);
           console.log(this.roleData);
+
+          console.log(this.select_word);
+            console.log(this.infoData);
         }
       });
     },
@@ -256,7 +333,7 @@ export default {
               message: response.message
             });
             this.deleteVisible = false;
-            
+
             this.getInfo();
           }
         });

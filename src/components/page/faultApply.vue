@@ -108,9 +108,11 @@
                 <template>
                     <el-divider>操作日志</el-divider>
                     <template >
-                        <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
-                            <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.name+' '+item.time+' '+ item.reason"></el-step>
-                        </el-steps>
+                        <template >
+                            <el-steps :active="3" direction="vertical" style="margin-left: 50px;">
+                                <el-step icon="el-icon-s-help" v-for="(item,i) in faultJournal" :key="item.id" :description="item.remarks+'  '+item.time"></el-step>
+                            </el-steps>
+                        </template>
                     </template>
                 </template>
                 <span slot="footer" class="dialog-footer">
@@ -246,27 +248,7 @@
                 //查看报备单详情
                 choosedRow:{},
                 showDialog: false,
-                faultJournal:[
-                    {
-                        id:1,
-                        name:'1号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:2,
-                        name:'2号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    },
-                    {
-                        id:3,
-                        name:'3号',
-                        time:'2019-08-12 00：00：00',
-                        reason:'故障上报'
-                    }
-                ],
-
+                faultJournal:[],
 
 
                 index:-1,
@@ -327,15 +309,27 @@
 
 
             //查看详细信息
-            showDetail(row){
-                console.log('被点击的行',this.tableData[row.index]);
-                this.choosedRow = this.tableData[row.index];
-//                this.$axios
-//                    .get('/api/api/faultInfo/'+this.choosedRow.faultId)
-//                    .then(function (response) {
-//                        console.log('单行结果',response);
-//                    });
 
+            showDetail(row){
+                console.log('查看报备单详情：被点击的行',this.tableData[row.index]);
+                const rowData = this.tableData[row.index];
+                this.choosedRow = rowData;
+                this.faultJournal = [
+                    {
+                        time:rowData.createdTime,
+                        remarks:'故障产生'
+                    },
+                    {
+                        time:rowData.submitedTime,
+                        remarks:'故障表单产生'
+                    }
+                ];
+                if(rowData.handledTime !== null){
+                    this.faultJournal.push({
+                        time:rowData.handledTime,
+                        remarks:'故障表单结束'
+                    })
+                }
                 this.showDialog = true;
 
             },
