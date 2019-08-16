@@ -6,7 +6,7 @@
                 <template>
                     
                     <el-select
-                        v-model="value1"
+                        v-model="departmentvalue"
                         collapse-tags
                         placeholder="部门">
                         <el-option
@@ -28,13 +28,13 @@
                     <template slot-scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
                 </el-table-column>
                 <el-table-column
-                    prop="applicationTitle_en"
+                    prop="enName"
                     label="应用英文名"
                     align="center"
                     width="130">
                 </el-table-column>
                 <el-table-column
-                    prop="applicationTitle_zh"
+                    prop="chName"
                     label="应用中文名"
                     align="center"
                     width="130">
@@ -46,13 +46,13 @@
                     width="130">
                 </el-table-column>
                 <el-table-column
-                    prop="applicationConnector"
+                    prop="contacts"
                     label="应用联系人"
                     align="center"
                     width="130">
                 </el-table-column>
                 <el-table-column
-                    prop="latestUpdate"
+                    prop="updateTime"
                     label="最后更新时间"
                     align="center"
                     width="150">
@@ -64,10 +64,10 @@
                     width="148">
                     <template slot-scope = "scope">
                         <div>
-                            <el-button  el-icon- @click.stop="edit(scope.$index)" type="text" size="small" >
+                            <el-button @click.stop="editDialog = true" type="text" size="small" >
                                 <i class="el-icon-edit-outline" style="font-size: 17px"></i>
                             </el-button>
-                            <el-button  @click="del(scope.$index)" style="color:red" type="text" size="small" >
+                            <el-button  @click.stop="del(scope.$index)" style="color:red" type="text" size="small" >
                                 <i class="el-icon-delete" style="font-size: 17px"></i>
                             </el-button>
                         </div>
@@ -78,30 +78,30 @@
             <!--添加应用信息单对话框-->
             <el-dialog title="添加应用信息" :visible.sync="addDialog" :before-close="handleClose" width="35%">
                 <el-form :model="addForm"  :rules="addRules" ref="addForm" >
-                    <el-form-item label="应用英文名" :label-width="formLabelWidth" prop="applicationTitle_en">
-                        <el-input v-model="addForm.applicationTitle_en" autocomplete="off" style="width:250px" req></el-input>
+                    <el-form-item label="应用英文名" :label-width="formLabelWidth" prop="enName">
+                        <el-input v-model="addForm.enName" autocomplete="off" style="width:250px" req></el-input>
                     </el-form-item>
-                    <el-form-item label="应用中文名" :label-width="formLabelWidth" prop="applicationTitle_zh">
-                        <el-input v-model="addForm.applicationTitle_zh" style="width:250px"></el-input>
+                    <el-form-item label="应用中文名" :label-width="formLabelWidth" prop="chName">
+                        <el-input v-model="addForm.chName" style="width:250px"></el-input>
                     </el-form-item>
                     <el-form-item label="所属部门" :label-width="formLabelWidth" prop="department">
                         <el-select v-model="addForm.department" placeholder="请选择部门" style="width:250px">
                             <el-option label="杭州开发一部" value="departOne"></el-option>
                             <el-option label="杭州开发二部" value="departTwo"></el-option>
-                            <el-option label="杭州开发三部" value="departOne"></el-option>
-                            <el-option label="杭州开发四部" value="departOne"></el-option>
+                            <el-option label="杭州开发三部" value="departThree"></el-option>
+                            <el-option label="杭州开发四部" value="departFour"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="applicationConnector">
-                       <el-input v-model="addForm.applicationConnector" placeholder="搜索姓名" style="width:250px"></el-input>
+                    <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="contacts">
+                       <el-input v-model="addForm.contacts" placeholder="搜索姓名" style="width:250px"></el-input>
                     </el-form-item>
                     <el-form-item  label="应用描述" :label-width="formLabelWidth" prop="description">
                         <el-input v-model="addForm.description" type="textarea" placeholder="应用描述信息" style="width:250px"></el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click='cancel'>取消</el-button>
-                    <el-button type="primary" @click="addDialog = false">确认添加</el-button>
+                    <el-button @click='addDialog = false'>取消</el-button>
+                    <el-button type="primary" @click="addApply">确认添加</el-button>
                 </div>
             </el-dialog>
 
@@ -113,52 +113,34 @@
                 :before-close="handleClose">
                 <template>
                     <el-form :model="editForm" :rules='addRules' ref="editForm">
-                        <el-form-item label="应用英文名" :label-width="formLabelWidth" prop="applicationTitle_en">
-                        <el-input v-model="addForm.applicationTitle_en" autocomplete="off" style="width:250px" req></el-input>
+                        <el-form-item label="应用英文名" :label-width="formLabelWidth" prop="enName">
+                        <el-input v-model="editForm.enName" autocomplete="off" style="width:250px" req></el-input>
                     </el-form-item>
-                    <el-form-item label="应用中文名" :label-width="formLabelWidth" prop="applicationTitle_zh">
-                        <el-input v-model="addForm.applicationTitle_zh" style="width:250px"></el-input>
+                    <el-form-item label="应用中文名" :label-width="formLabelWidth" prop="chName">
+                        <el-input v-model="editForm.chName" style="width:250px"></el-input>
                     </el-form-item>
                     <el-form-item label="所属部门" :label-width="formLabelWidth" prop="department">
-                        <el-select v-model="addForm.department" placeholder="请选择部门" style="width:250px">
+                        <el-select v-model="editForm.department" placeholder="请选择部门" style="width:250px">
                             <el-option label="杭州开发一部" value="departOne"></el-option>
                             <el-option label="杭州开发二部" value="departTwo"></el-option>
                             <el-option label="杭州开发三部" value="departOne"></el-option>
                             <el-option label="杭州开发四部" value="departOne"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="applicationConnector">
-                       <el-input v-model="addForm.applicationConnector" placeholder="搜索姓名" style="width:250px"></el-input>
+                    <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="contacts">
+                       <el-input v-model="editForm.contacts" placeholder="搜索姓名" style="width:250px"></el-input>
                     </el-form-item>
                     <el-form-item  label="应用描述" :label-width="formLabelWidth" prop="description">
-                        <el-input v-model="addForm.description" type="textarea" placeholder="应用描述信息" style="width:250px"></el-input>
+                        <el-input v-model="editForm.description" type="textarea" placeholder="应用描述信息" style="width:250px"></el-input>
                     </el-form-item>
                 </el-form>
                 </template>
                 <span slot="footer" class="dialog-footer">
-                    <el-button @click="cancel">取 消</el-button>
-                    <el-button type="primary" @click="editDialog = false">确 定</el-button>
+                    <el-button @click="editDialog = false">取 消</el-button>
+                    <el-button type="primary" @click="edit(scope.$index)">确 定</el-button>
                 </span>
             </el-dialog>
 
-            <!--删除应用信息对话框-->
-            <el-dialog
-                title="提示"
-                :visible.sync="delDialog"
-                width="35%"
-                :before-close="handleClose">
-                <template>
-                    <el-form :model="delForm" ref="delForm">
-                        <i class="el-icon-warning" style="font-size: 17px"></i>
-                        <el-form-item label="是否确认删除应用：F-ABC中文名称？" :label-width="formLabelWidth" prop="enname">
-                        </el-form-item>
-                    </el-form>
-                </template>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="delDialog = false">取 消</el-button>
-                    <el-button type="primary" @click="delDialog = false">确 定</el-button>
-                </span>
-            </el-dialog>
 
             <div style="text-align: center;margin-top: 30px;">
                 <el-pagination
@@ -181,37 +163,37 @@
         data: function(){
             return {
                 tableData: [
-                    {
-                       applicationTitle_en:'F-ABC',
-                       applicationTitle_zh:'中文名称',
-                       department:'杭州开发一部',
-                       applicationConnector:'某某1',
-                       latestUpdate:'2019-08-07 16:30:00',
-                    },
-                    {
-                       applicationTitle_en:'F-ABC',
-                       applicationTitle_zh:'中文名称',
-                       department:'杭州开发一部',
-                       applicationConnector:'某某1',
-                       latestUpdate:'2019-08-07 16:30:00',
-                    },
-                    {
-                       applicationTitle_en:'F-ABC',
-                       applicationTitle_zh:'中文名称',
-                       department:'杭州开发一部',
-                       applicationConnector:'某某1',
-                       latestUpdate:'2019-08-07 16:30:00',
+                    // {
+                    //     enName:'F-ABC',
+                    //     chName:'中文名称',
+                    //    department:'杭州开发一部',
+                    //    contacts:'某某1',
+                    //    updateTime:'2019-08-07 16:30:00',
+                    // },
+                    // {
+                    //     enName:'F-ABC',
+                    //     chName:'中文名称',
+                    //    department:'杭州开发一部',
+                    //    contacts:'某某1',
+                    //    updateTime:'2019-08-07 16:30:00',
+                    // },
+                    // {
+                    //     enName:'F-ABC',
+                    //     chName:'中文名称',
+                    //    department:'杭州开发一部',
+                    //    contacts:'某某1',
+                    //    updateTime:'2019-08-07 16:30:00',
 
-                    },
-                    {
-                       applicationTitle_en:'F-ABC',
-                       applicationTitle_zh:'中文名称',
-                       department:'杭州开发一部',
-                       applicationConnector:'某某1',
-                       latestUpdate:'2019-08-07 16:30:00',
-                    },
+                    // },
+                    // {
+                    //     enName:'F',
+                    //     chName:'名称',
+                    //    department:'杭州开发一部',
+                    //    contacts:'某某1',
+                    //    updateTime:'2019-08-07 16:30:00',
+                    // },
                 ],
-                total:4,
+                total: 1,
                 pageSize:10,
                 currentPage:1,
                 selectWord: "",
@@ -233,35 +215,20 @@
                         label: '杭州开发四部'
                     }
                 ],
-                value1: '',
+                departmentvalue: '',
                 value2: '',
                 addForm:{
-                    applicationTitle_en:'',
-                    applicationTitle_zh:'',
+                    enName:'',
+                    chName:'',
                     department:'',
-                    applicationConnector:'',
-                    latestUpdate:''
+                    contacts:'',
+                    updateTime:''
                 },
                 addRules:{
-                    applicationTitle_en:[
-                        { required: true, message: '请输入应用英文名', trigger: 'blur' }
-                    ],
-                    applicationTitle_zh:[
-                        { required: true, message: '请输入应用中文名', trigger: 'blur' }
-                    ],
-                    department:[
-                        { required: true, message: '请选择所属部门', trigger: 'change' }
-                    ],
-                    applicationConnector:[
-                        { required: true, message: '请搜索联系人', trigger: 'change' }
-                    ],
-                    latestUpdate:[
-                        { required: true, message: '请输入最新更新时间', trigger: 'blur' }
-                    ],
+                    rules:[],
                 },
                 index:-1,
                 choosedRow:{},
-                delDialog:false,
                 editDialog:false,
                 addDialog:false,
                 ruleForm:{
@@ -272,9 +239,9 @@
                 editForm:{
 				 dealResult:''
                 },
-                delForm:{
-                 dealResult:''
-                },
+                // delForm:{
+                //  dealResult:''
+                // },
                 
             }
         },
@@ -285,18 +252,15 @@
             //          获取表单初始数据
             getData() {
                 this.$axios
-                    .get("/api/ApplyInfo?pageNum="+this.currentPage+
-                    '&status='+this.statusValue+'&application='+this.applicationValue+
-                    '&applyTitle='+this.selectWord)
+                    .post("/api/api/getInfo?pageNum="+this.currentPage+'&department='+this.departmentvalue+'&enName='+this.selectWord)
                     .then(response => {
                         if (response.status === 200) {
-                                this.tableData = response.data.records;
+                            this.total = response.data.total;
+                            console.log("total:"+this.total)
+                            this.tableData = response.data.records;
+                            console.log(this.tableData)
                             }
                     });
-            },
-
-            onSubmit() {
-                this.$message.success('添加应用信息成功！');
             },
 
 //          分页跳转
@@ -311,16 +275,18 @@
                 console.log(this.addForm);
                 const formData = this.addForm;
                 this.$axios
-                    .post("/api/appInfo",formData)
+                    .post("/api/api/appInfo",formData)
                     .then(response=>{
                             if (response.status === 200) {
-                                this.getData();
+                                this.$message({
+                                    type:"success",
+                                    message: response.message
+                                });
                                 this.addDialog = false;
+                                this.getData();
                             }
                         }
                     );
-                this.addDialog = false;
-                console.log('确认上报');
             },
 
 // 根据条件搜索
@@ -329,15 +295,29 @@
                 this.getData();
             },
 
-            cancel() {
-                this.addDialog = false;
-                this.editDialog = false;
-                this.$nextTick(() => {
-	                this.$refs["addForm"].resetFields();       // this.$refs.adduserform.resetFields();
-                });
-                this.$nextTick(() => {
-	                this.$refs["editForm"].resetFields();       // this.$refs.adduserform.resetFields();
-                });
+            del(index) {
+                const rowData = this.tableData[index];
+                console.log(rowData) ;
+                console.log(rowData.appId)
+                this.$confirm("是否确认删除应用："+rowData.enName+' '+rowData.chName+'?','提示', {
+                    confirmButtonText:'确定',
+                    cancelButtonText:'取消',
+                    type:'warning'
+                }).then(() => {
+                    this.$axios
+                    .get("/api/api/appInfo/" + rowData.appId)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                console.log("删除成功");
+                                this.$message({
+                                    type:"success",
+                                    message: response.message
+                                });
+                                this.getData();
+                            }
+                        }
+                    );
+                })
             },
 
             //编辑应用信息
@@ -348,35 +328,23 @@
                 const formData = this.editForm;
                 const rowData = this.tableData[index];
                 console.log(rowData) ;
+                console.log(rowData.appId)
                 this.$axios
-                    .post("/api/appInfo/" + rowData.app_id,formData)
+                    .post("/api/api/appInfo/" + rowData.appId,formData)
                     .then(response=>{
                             if (response.status === 200) {
                                 console.log('更新成功');
+                                this.$message({
+                                    type:"success",
+                                    message: response.message
+                                });
+                                this.editDialog = false;
+                                this.getData();
                             }
                         }
                     );
-                this.editDialog = false;
+                
 
-            },
-
-            //删除应用信息
-            del(index) {
-                this.$confirm("是否确认删除应用：F-ABC中文名称？",'提示', {
-                    confirmButtonText:'确定',
-                    cancelButtonText:'取消',
-                    type:'warning'
-                });
-                const rowData = this.tableData[index];
-                console.log(rowData) ;
-                this.$axios
-                    .get("/api/appInfo/" + rowData.app_id)
-                    .then(response=>{
-                            if (response.status === 200) {
-                                console.log("删除成功")
-                            }
-                        }
-                    );
             },
 
             tableRowClassName ({row, rowIndex}) {
@@ -408,14 +376,6 @@
                         done();
                     })
                     .catch(_ => {});
-                
-                this.$nextTick(() => {
-	                this.$refs["editForm"].resetFields();       // this.$refs.adduserform.resetFields();
-                });
-
-                this.$nextTick(() => {
-	                this.$refs["addForm"].resetFields();       // this.$refs.adduserform.resetFields();
-                });
                
             },
 
