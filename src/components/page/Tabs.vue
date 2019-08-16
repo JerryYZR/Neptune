@@ -21,7 +21,7 @@
                 <el-button icon="el-icon-search"  @click="search" type="info"></el-button>
             </div>
             <el-table
-                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :data="tableData"
                 :row-class-name="tableRowClassName"
                 border style="width: 100%">
                 <el-table-column label="序号" align="center" width="70" fixed="left">
@@ -64,8 +64,12 @@
                     width="148">
                     <template slot-scope = "scope">
                         <div>
-                        <el-button  @click.stop="edit" type="text" size="small" >编辑</el-button>
-                        <el-button  @click.stop="del" type="text" size="small" >删除</el-button>
+                            <el-button  el-icon- @click.stop="edit(scope.$index)" type="text" size="small" >
+                                <i class="el-icon-edit-outline" style="font-size: 17px"></i>
+                            </el-button>
+                            <el-button  @click="del(scope.$index)" style="color:red" type="text" size="small" >
+                                <i class="el-icon-delete" style="font-size: 17px"></i>
+                            </el-button>
                         </div>
                     </template> 
                 </el-table-column>
@@ -145,7 +149,8 @@
                 :before-close="handleClose">
                 <template>
                     <el-form :model="delForm" ref="delForm">
-                        <el-form-item label="是否确认删除应用：F-ABC中文名称？" icon='el-icon-warning' :label-width="formLabelWidth" prop="enname">
+                        <i class="el-icon-warning" style="font-size: 17px"></i>
+                        <el-form-item label="是否确认删除应用：F-ABC中文名称？" :label-width="formLabelWidth" prop="enname">
                         </el-form-item>
                     </el-form>
                 </template>
@@ -210,6 +215,7 @@
                 pageSize:10,
                 currentPage:1,
                 selectWord: "",
+                applicationValue: '',
                 departmentOptions:[
                     {
                         value: '杭州开发一部',
@@ -276,46 +282,52 @@
             this.getData();
         },
         methods: {
+            //          获取表单初始数据
+            getData() {
+                this.$axios
+                    .get("/api/ApplyInfo?pageNum="+this.currentPage+
+                    '&status='+this.statusValue+'&application='+this.applicationValue+
+                    '&applyTitle='+this.selectWord)
+                    .then(response => {
+                        if (response.status === 200) {
+                                this.tableData = response.data.records;
+                            }
+                    });
+            },
+
             onSubmit() {
                 this.$message.success('添加应用信息成功！');
             },
 
-//          页码修改
+//          分页跳转
             current_change(currentPage){
                 console.log('现在所在的页',currentPage);
-                console.log('现在所在的页',this.tableData.slice((currentPage-1)*this.pageSize,currentPage*this.pageSize));
                 this.currentPage = currentPage;
-//                this.$axios
-//                    .post("/ticket",{
-//                        current:currentPage
-//                    })
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                    });
+                this.getData();
             },
 
-//          根据条件搜索
-            search(){
-                console.log(this.value1);
-                console.log(this.value2);
-                console.log(this.selectWord);
-//                var url= '';
-//                var requestHead = {
-//                    value1:this.value1,
-//                    value1:this.value2,
-//                    selectWord:this.selectWord
-//                }
-//                this.$axios
-//                    .post(url,requestHead)
-//                    .then(function (response) {
-//                        console.log(response);
-//                    })
-//                    .catch(function (error) {
-//                        console.log(error);
-//                    });
+            //添加应用说明
+            addApply() {
+                console.log(this.addForm);
+                const formData = this.addForm;
+                this.$axios
+                    .post("/api/appInfo",formData)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                this.getData();
+                                this.addDialog = false;
+                            }
+                        }
+                    );
+                this.addDialog = false;
+                console.log('确认上报');
             },
-            
+
+// 根据条件搜索
+            search(){
+                console.log(this.applicationValue+','+this.statusValue+','+this.selectWord);
+                this.getData();
+            },
 
             cancel() {
                 this.addDialog = false;
@@ -328,9 +340,66 @@
                 });
             },
 
+            //编辑应用信息
+            edit(index) {
+                console.log('点击按钮');
+                this.editDialog = true
+                console.log(this.editForm);
+                const formData = this.editForm;
+                const rowData = this.tableData[index];
+                console.log(rowData) ;
+                this.$axios
+                    .post("/api/appInfo/" + rowData.app_id,formData)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                console.log('更新成功');
+                            }
+                        }
+                    );
+                this.editDialog = false;
+
+            },
+
+            //删除应用信息
+            del(index) {
+                this.$confirm("是否确认删除应用：F-ABC中文名称？",'提示', {
+                    confirmButtonText:'确定',
+                    cancelButtonText:'取消',
+                    type:'warning'
+                });
+                const rowData = this.tableData[index];
+                console.log(rowData) ;
+                this.$axios
+                    .get("/api/appInfo/" + rowData.app_id)
+                    .then(response=>{
+                            if (response.status === 200) {
+                                console.log("删除成功")
+                            }
+                        }
+                    );
+            },
+
             tableRowClassName ({row, rowIndex}) {
                 //把每一行的索引放进row
                 row.index = rowIndex;
+            },
+
+            
+
+            submitForm(formName) {
+                var result = this.ruleForm.dealResult;
+                var faultId = this.choosedRow.faultId;
+                console.log('result',result);
+                console.log('被提交的这条记录信息：',this.choosedRow);
+                this.$axios
+                    .post('/api/api/faultInfoHandle',{
+                        faultId:faultId,
+                        result:result
+                    })
+                    .then(function (response) {
+                        alert('success!')
+                    });
+
             },
 
             handleClose(done) {
@@ -350,16 +419,8 @@
                
             },
 
-            edit() {
-                console.log('点击按钮');
-                this.editDialog = true
-            },
-
-            del() {
-                console.log('点击按钮');
-                this.delDialog = true
-            },
-
+            
+        
 //            提交处理结果
             submitForm(formName) {
 //                var result = this.ruleForm.dealResult;
@@ -371,18 +432,6 @@
 //                        alert('success!')
 //                    });
 
-            },
-
-
-//          获取表单初始数据
-            getData() {
-//                this.$axios
-//                    .post("/ticket")
-//                    .then(function (response) {
-//                        console.log(response);
-//                        this.tableData = response.records;
-//                        this.total = response.total;
-//                    });
             },
 
         }
