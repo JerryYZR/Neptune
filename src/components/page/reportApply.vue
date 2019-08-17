@@ -30,31 +30,37 @@
                     <template slot-scope="scope"><span>{{scope.$index+1}} </span></template>
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="malCap"
                     label="标题"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="malState"
                     label="状态"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="contact"
                     label="联系人"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="tel"
                     label="联系方式"
                     width="150">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="repTime"
                     label="创建时间"
                     width="">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     fixed="right"
                     label="操作"
                     width="80">
@@ -168,7 +174,7 @@
                 <el-pagination
                     background
                     layout="prev, pager, next"
-                    :total='tableData.length'
+                    :total='total'
                     :page-size="pageSize"
                     @current-change="currentChange">
                 </el-pagination>
@@ -188,6 +194,7 @@ export default {
   data: function() {
     return {
       //分页相关
+      total: 1,
       pageSize: 10,
       currentPage: 1,
 
@@ -277,7 +284,8 @@ export default {
           console.log(response.data.records);
           this.tableData = response.data.records;
           console.log(this.tableData);
-        });
+          this.total = response.data.total;
+        })
     },
 
     //页码修改

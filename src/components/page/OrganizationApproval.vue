@@ -49,7 +49,7 @@
                     @current-change="handleCurrentChange"
                     layout="prev, pager, next"
                     :page-size="pagesize"
-                    :total="applyData.length">
+                    :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -206,6 +206,7 @@ export default {
       cur_page: 1,
       multipleSelection: [],
       select_cate: "",
+      total: 1,
       select_word: "",
       applyEditVisible: false,
       applyAddVisible: false,
@@ -251,6 +252,7 @@ export default {
           if (response.status === 200) {
             this.applyData = response.data.records;
             console.log(this.applyData);
+            this.total = response.data.total;
           }
         });
 

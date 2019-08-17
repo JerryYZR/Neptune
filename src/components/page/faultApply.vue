@@ -38,34 +38,40 @@
                     <template slot-scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="faultTitle"
                     label="故障标题"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="status"
                     label="状态"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="faultApplication"
                     label="故障应用"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="linkMan"
                     label="联系人"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="linkPhone"
                     label="联系方式"
                     width="120">
                 </el-table-column>
                 <el-table-column
+                    align="center"
                     prop="createdTime"
                     label="创建时间"
-                    width="202">
+                    width="">
                 </el-table-column>
             </el-table>
 
@@ -175,207 +181,198 @@
 
 
 <script>
-    export default {
-        name: 'editor',
-        data: function(){
-            return {
-                //分页相关
-                total:4,
-                pageSize:10,
-                currentPage:1,
+export default {
+  name: "editor",
+  data: function() {
+    return {
+      //分页相关
+      total: 1,
+      pageSize: 10,
+      currentPage: 1,
 
+      //新增故障报备
+      addDialog: false,
+      addForm: {
+        faultTitle: "",
+        content: "",
+        faultApplication: "",
+        createdTime: "",
+        linkMan: "",
+        linkPhone: ""
+      },
+      addRules: {
+        faultTitle: [
+          { required: true, message: "请输入故障标题", trigger: "blur" }
+        ],
+        content: [
+          { required: true, message: "请输入故障内容", trigger: "blur" }
+        ],
+        faultApplication: [
+          { required: true, message: "请选择故障应用", trigger: "change" }
+        ],
+        createdTime: [
+          { required: true, message: "请选择故障时间", trigger: "change" }
+        ],
+        linkMan: [{ required: true, message: "请输入联系人", trigger: "blur" }],
+        linkPhone: [
+          { required: true, message: "请输入联系电话", trigger: "blur" }
+        ]
+      },
 
-                //新增故障报备
-                addDialog:false,
-                addForm:{
-                    faultTitle:'',
-                    content:'',
-                    faultApplication:'',
-                    createdTime:'',
-                    linkMan:'',
-                    linkPhone:''
-                },
-                addRules:{
-                    faultTitle:[
-                        { required: true, message: '请输入故障标题', trigger: 'blur' }
-                    ],
-                    content:[
-                        { required: true, message: '请输入故障内容', trigger: 'blur' }
-                    ],
-                    faultApplication:[
-                        { required: true, message: '请选择故障应用', trigger: 'change' }
-                    ],
-                    createdTime:[
-                        { required: true, message: '请选择故障时间', trigger: 'change' }
-                    ],
-                    linkMan:[
-                        { required: true, message: '请输入联系人', trigger: 'blur' }
-                    ],
-                    linkPhone:[
-                        { required: true, message: '请输入联系电话', trigger: 'blur' }
-                    ]
-                },
-
-
-
-                //条件筛选
-                applicationValue: '',
-                statusValue:'',
-                selectWord: "",
-                applicationOptions: [{
-                    value: '0',
-                    label: 'F-ABC'
-                }, {
-                    value: '1',
-                    label: 'F-CDE'
-                }],
-                statusOptions:[
-                    {
-                        value: '0',
-                        label: '已处理'
-                    }, {
-                        value: '1',
-                        label: '未处理'
-                    }
-                ],
-
-
-//                表格
-                tableData: [],
-
-
-
-                //查看报备单详情
-                choosedRow:{},
-                showDialog: false,
-                faultJournal:[],
-
-
-                index:-1,
-                formLabelWidth:'120px',
-                formInputWidth:'300px',
-
-
-            }
+      //条件筛选
+      applicationValue: "",
+      statusValue: "",
+      selectWord: "",
+      applicationOptions: [
+        {
+          value: "0",
+          label: "F-ABC"
         },
-        created() {
-            this.getData();
-        },
-        methods: {
-            //获取表单初始数据
-            getData() {
-                this.$axios
-                    .get("/api/api/userfaultInfo?pageNum="+this.currentPage+'&status='+this.statusValue+'&faultApplication='+this.applicationValue+'&faultTitle='+this.selectWord)
-                    .then(response=>{
-                            if (response.status === 200) {
-                                this.tableData = response.data.records;
-                            }
-                        }
-                    );
-            },
-
-
-            //分页跳转
-            currentChange(currentPage){
-                console.log('现在所在的页',currentPage);
-                this.currentPage = currentPage;
-                this.getData();
-            },
-
-
-            //添加故障单
-            addRecord(){
-                console.log(this.addForm);
-                const formData = this.addForm;
-                this.$axios
-                    .post("/api/api/faultInfoSub",formData)
-                    .then(response=>{
-                            if (response.status === 200) {
-                                this.getData();
-                                this.addDialog = false;
-                            }
-                        }
-                    );
-                this.addDialog = false;
-                console.log('确认上报');
-            },
-
-
-            // 根据条件搜索
-            search(){
-                console.log(this.applicationValue+','+this.statusValue+','+this.selectWord);
-                this.getData();
-            },
-
-
-            //查看详细信息
-
-            showDetail(row){
-                console.log('查看报备单详情：被点击的行',this.tableData[row.index]);
-                const rowData = this.tableData[row.index];
-                this.choosedRow = rowData;
-                this.faultJournal = [
-                    {
-                        time:rowData.createdTime,
-                        remarks:'故障产生'
-                    },
-                    {
-                        time:rowData.submitedTime,
-                        remarks:'故障表单产生'
-                    }
-                ];
-                if(rowData.handledTime !== null){
-                    this.faultJournal.push({
-                        time:rowData.handledTime,
-                        remarks:'故障表单结束'
-                    })
-                }
-                this.showDialog = true;
-
-            },
-            tableRowClassName ({row, rowIndex}) {
-                //把每一行的索引放进row
-                row.index = rowIndex;
-            },
-
-
-            //处理对话框的关闭
-            handleClose(done) {
-                this.$confirm('确认关闭？')
-                    .then(_ => {
-                        done();
-                    })
-                    .catch(_ => {});
-            },
-
-
+        {
+          value: "1",
+          label: "F-CDE"
         }
+      ],
+      statusOptions: [
+        {
+          value: "0",
+          label: "已处理"
+        },
+        {
+          value: "1",
+          label: "未处理"
+        }
+      ],
 
+      //                表格
+      tableData: [],
+
+      //查看报备单详情
+      choosedRow: {},
+      showDialog: false,
+      faultJournal: [],
+
+      index: -1,
+      formLabelWidth: "120px",
+      formInputWidth: "300px"
+    };
+  },
+  created() {
+    this.getData();
+  },
+  methods: {
+    //获取表单初始数据
+    getData() {
+      this.$axios
+        .get(
+          "/api/api/userfaultInfo?pageNum=" +
+            this.currentPage +
+            "&status=" +
+            this.statusValue +
+            "&faultApplication=" +
+            this.applicationValue +
+            "&faultTitle=" +
+            this.selectWord
+        )
+        .then(response => {
+          if (response.status === 200) {
+            this.tableData = response.data.records;
+            this.total = response.data.total;
+          }
+        });
+    },
+
+    //分页跳转
+    currentChange(currentPage) {
+      console.log("现在所在的页", currentPage);
+      this.currentPage = currentPage;
+      this.getData();
+    },
+
+    //添加故障单
+    addRecord() {
+      console.log(this.addForm);
+      const formData = this.addForm;
+      this.$axios.post("/api/api/faultInfoSub", formData).then(response => {
+        if (response.status === 200) {
+          this.getData();
+          this.addDialog = false;
+        }
+      });
+      this.addDialog = false;
+      console.log("确认上报");
+    },
+
+    // 根据条件搜索
+    search() {
+      console.log(
+        this.applicationValue + "," + this.statusValue + "," + this.selectWord
+      );
+      this.getData();
+    },
+
+    //查看详细信息
+
+    showDetail(row) {
+      console.log("查看报备单详情：被点击的行", this.tableData[row.index]);
+      const rowData = this.tableData[row.index];
+      this.choosedRow = rowData;
+      this.faultJournal = [
+        {
+          time: rowData.createdTime,
+          remarks: "故障产生"
+        },
+        {
+          time: rowData.submitedTime,
+          remarks: "故障表单产生"
+        }
+      ];
+      if (rowData.handledTime !== null) {
+        this.faultJournal.push({
+          time: rowData.handledTime,
+          remarks: "故障表单结束"
+        });
+      }
+      this.showDialog = true;
+    },
+    tableRowClassName({ row, rowIndex }) {
+      //把每一行的索引放进row
+      row.index = rowIndex;
+    },
+
+    //处理对话框的关闭
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(_ => {
+          done();
+        })
+        .catch(_ => {});
     }
+  }
+};
 </script>
 
 
 <style>
-    .handle-box {
-        margin-bottom: 20px;
-    }
+.handle-box {
+  margin-bottom: 20px;
+}
 
-    .handle-input {
-        width: 150px;
-        display: inline-block;
-    }
+.handle-input {
+  width: 150px;
+  display: inline-block;
+}
 
-    .grid-content {
-        border-radius: 4px;
-        min-height: 36px;
-    }
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
+}
 
-    .el-dialog__body{
-        padding-top: 0px;
-    }
+.el-dialog__body {
+  padding-top: 0px;
+}
 
-    .el-dialog {
-      width:40%
-    }
-
+.el-dialog {
+  width: 40%;
+}
 </style>

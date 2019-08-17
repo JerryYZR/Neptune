@@ -39,7 +39,7 @@
                     @current-change="handleCurrentChange" 
                     layout="prev, pager, next" 
                     :page-size="pagesize" 
-                    :total="corporationData.length">
+                    :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -192,6 +192,7 @@ export default {
       multipleSelection: [],
       select_word: "",
       is_search: false,
+      total: 1,
       editVisible: false,
       delVisible: false,
       addVisible: false,
@@ -243,6 +244,7 @@ export default {
             this.corporationData = response.data.records;
             console.log(1);
             console.log(this.corporationData);
+            this.total = response.data.total;
           }
         });
 
