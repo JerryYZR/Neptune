@@ -120,7 +120,7 @@
                 </el-table-column>
                 <el-table-column prop="roleId" label="角色ID" width="120">
                 </el-table-column>
-                <el-table-column prop="roleIntro" label="角色描述" :formatter="formatter">
+                <el-table-column prop="roleIntro" label="角色描述">
                 </el-table-column>
             </el-table>
             <span slot="footer" class="dialog-footer">
@@ -254,7 +254,7 @@ export default {
           if (response.status === 200) {
             this.infoData = response.data;
             this.masterData = this.infoData.roleInfoList;
-            console.log(this.infoData);
+            console.log(this.masterData);
           }
         });
     },
@@ -271,7 +271,7 @@ export default {
           if (response.status === 200) {
             this.infoData = response.data;
             this.masterData = this.infoData.roleInfoList;
-            console.log(this.infoData);
+            console.log(this.masterData);
           }
         });
     },
@@ -287,8 +287,10 @@ export default {
           token: localStorage.getItem("token")
         }
       };
+      console.log(this.multipleSelection)
       for (var i = 0; i < this.multipleSelection.length; i++) {
         let item = this.multipleSelection[i];
+        console.log(i)
         console.log(item);
         formData.set("roleId", item.roleId);
         this.$axios
