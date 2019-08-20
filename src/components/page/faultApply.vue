@@ -45,9 +45,12 @@
                 </el-table-column>
                 <el-table-column
                     align="center"
-                    prop="status"
                     label="状态"
                     width="120">
+                    <template slot-scope="scope">
+                        <div v-if="tableData[scope.$index].status == 0">待处理</div>
+                        <div v-if="tableData[scope.$index].status == 1">已处理</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     align="center"
@@ -227,8 +230,7 @@ export default {
       applicationValue: "",
       statusValue: "",
       selectWord: "",
-      applicationOptions: [
-      ],
+      applicationOptions: [],
       statusOptions: [
         {
           value: "",
@@ -281,20 +283,24 @@ export default {
           }
         });
 
-
-        this.$axios
+      this.$axios
         .post(
           "/api/api/getInfo?pageNum=" +
             1 +
             "&department=" +
-            '' +
+            "" +
             "&enName=" +
-            ''
+            ""
         )
         .then(response => {
           if (response.status === 200) {
-              console.log(response.data.records)
+            console.log(response.data.records);
             this.applicationOptions = response.data.records;
+            let temp1 = {
+              appId: "",
+              chName: "全部"
+            };
+            this.applicationOptions.push(temp1);
           }
         });
     },

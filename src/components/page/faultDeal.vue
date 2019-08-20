@@ -294,6 +294,11 @@ export default {
           if (response.status === 200) {
               console.log(response.data.records)
             this.applicationOptions = response.data.records;
+            let temp1 = {
+              appId: "",
+              chName: "全部"
+            };
+            this.applicationOptions.push(temp1);
           }
         });
     },
