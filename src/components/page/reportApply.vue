@@ -27,7 +27,7 @@
                 style="width: 100%"
                 ref="multipleTable">
                 <el-table-column label="序号" align="center" width="70" fixed="left">
-                    <template slot-scope="scope"><span>{{scope.$index+1}} </span></template>
+                    <template slot-scope="scope"><span>{{scope.$index+(currentPage - 1) * pageSize + 1}} </span></template>
                 </el-table-column>
                 <el-table-column
                     align="center"
@@ -37,9 +37,13 @@
                 </el-table-column>
                 <el-table-column
                     align="center"
-                    prop="malState"
                     label="状态"
                     width="120">
+                    <template slot-scope="scope">
+                        <div v-if="tableData[scope.$index].malState == 0">待确认</div>
+                        <div v-if="tableData[scope.$index].malState == 1">已撤销</div>
+                        <div v-if="tableData[scope.$index].malState == 2">已确认</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     align="center"
@@ -66,7 +70,7 @@
                     width="80">
                     <template slot-scope="scope">
                         <el-button  @click.stop="show(scope.$index, scope.row)" type="text" size="medium" ><i class="el-icon-info" style="font-size: 17px"></i></el-button>
-                        <el-button  @click.stop="rollback(scope.$index, scope.row)" type="text" size="medium" ><i class="el-icon-refresh" style="font-size: 17px"></i></el-button>
+                        <el-button  v-if="tableData[scope.$index].malState == 0" @click.stop="rollback(scope.$index, scope.row)" type="text" size="medium" ><i class="el-icon-refresh" style="font-size: 17px"></i></el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -222,6 +226,10 @@ export default {
       status: "",
       statusOptions: [
         {
+          value: "",
+          label: "全部"
+        },
+        {
           value: 0,
           label: "已提交"
         },
@@ -354,6 +362,7 @@ export default {
         .then(response => {
           if (response.status === 200) {
             this.addDialog = false;
+            this.getData();
           }
         });
     },

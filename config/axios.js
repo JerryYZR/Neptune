@@ -35,20 +35,22 @@ axios.interceptors.response.use(function (response) {
         console.log(123235)
         // this.$router.push("/login#/login");
     }
+    response.message = response.data.message;
+    console.log(response.data)
+    console.log(response.message)
     if (response.data.code == 200) {
-        console.log(response)
         response.type = "success"
         response.data = response.data.data;
     }else if(response.data.code == 666){
         response.type = "error"
     }else if(response.data.code == 670){
         response.type = "error"
-        this.$router.push("/login#/login");
+        // this.$router.push("/login#/login");
         // window.location.href = "/login#/login";
     }else{
         response.type = "error"
     }
-    response.message = response.data.message;
+    
     return response
 }, function (error) {
     // 对响应错误做点什么

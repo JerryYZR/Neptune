@@ -37,6 +37,9 @@
             <el-form-item label="邮箱">
                 <el-input v-model="form.email"></el-input>
             </el-form-item>
+            <el-form-item label="电话">
+                <el-input v-model="form.tel"></el-input>
+            </el-form-item>
             <el-form-item label="地址">
                 <el-input v-model="form.addr"></el-input>
             </el-form-item>
@@ -93,12 +96,12 @@ export default {
       this.$axios
         .post("/api/login", convert_FormData_to_json2(formData), config)
         .then(response => {
-          if (response.status === 200) {
+          if (response.type == "success") {
             console.log(response)
             localStorage.setItem("role", response.data.roles);
             localStorage.setItem("token", response.data.token);
             localStorage.setItem('ms_username',this.ruleForm.username);
-              this.$router.push("/");
+            this.$router.push("/");
 
           } else {
             this.$message({
@@ -113,7 +116,8 @@ export default {
       formData.append("userName", this.form.username);
       formData.append("password", this.form.password);
       formData.append("nickname", this.form.nickname);
-      formData.append("gender", this.form.gendre);
+      formData.append("gender", this.form.gender);
+      formData.append("telphone", this.form.tel);
       formData.append("email", this.form.email);
       formData.append("addr", this.form.addr);
       formData.append("office", this.form.office);
@@ -133,11 +137,6 @@ export default {
           if (response.status === 200) {
             this.$message({
               type: response.type,
-              message: response.message
-            });
-          } else {
-            this.$message({
-              type: "error",
               message: response.message
             });
           }

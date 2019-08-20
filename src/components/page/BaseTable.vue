@@ -14,14 +14,14 @@
             <el-table :data="corporationData" border style="width: 100%" ref="multipleTable">
                 <el-table-column align="center" width="55">
                     <template slot-scope="scope">
-                        <div>{{scope.$index+1}}</div>
+                        <div>{{scope.$index+(cur_page - 1) * pageSize + 1}} </div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="orgId" label="组织编号" align="center" width="170">
                 </el-table-column>
                 <el-table-column prop="orgName" label="组织名称" align="center" width="170">
                 </el-table-column>
-                <el-table-column prop="orgType" label="组织类型" align="center" width="170">
+                <el-table-column prop="type" label="组织类型" align="center" width="170">
                 </el-table-column>
                 <el-table-column prop="createPerson" label="创建人员" align="center" width="170">
                 </el-table-column>
@@ -189,6 +189,7 @@ export default {
     return {
       url: "./static/vuetable.json",
       cur_page: 1,
+      pageSize: 10,
       multipleSelection: [],
       select_word: "",
       is_search: false,

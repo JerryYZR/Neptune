@@ -7,9 +7,9 @@
                     <el-select v-model="applicationValue" placeholder="应用">
                         <el-option
                             v-for="item in applicationOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                            :key="item.appId"
+                            :label="item.chName"
+                            :value="item.appId">
                         </el-option>
                     </el-select>
                     <el-select
@@ -104,7 +104,7 @@
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content">联系人</div></el-col>
-                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkman}}</div></el-col>
+                        <el-col :span="12"><div class="grid-content ">{{choosedRow.linkMan}}</div></el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" justify="center">
                         <el-col :span="6"><div class="grid-content ">联系方式</div></el-col>
@@ -138,8 +138,12 @@
                     </el-form-item>
                     <el-form-item label="故障应用" :label-width="formLabelWidth" prop="faultApplication">
                         <el-select v-model="addForm.faultApplication" placeholder="请选择故障应用" style="width:250px">
-                            <el-option label="故障1" value="0"></el-option>
-                            <el-option label="故障2" value="1"></el-option>
+                            <el-option
+                            v-for="item in applicationOptions"
+                            :key="item.chName"
+                            :label="item.chName"
+                            :value="item.chName">
+                        </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="故障时间" :label-width="formLabelWidth" prop="createdTime">
@@ -224,16 +228,12 @@ export default {
       statusValue: "",
       selectWord: "",
       applicationOptions: [
-        {
-          value: "0",
-          label: "F-ABC"
-        },
-        {
-          value: "1",
-          label: "F-CDE"
-        }
       ],
       statusOptions: [
+        {
+          value: "",
+          label: "全部"
+        },
         {
           value: "0",
           label: "已处理"
@@ -278,6 +278,23 @@ export default {
           if (response.status === 200) {
             this.tableData = response.data.records;
             this.total = response.data.total;
+          }
+        });
+
+
+        this.$axios
+        .post(
+          "/api/api/getInfo?pageNum=" +
+            1 +
+            "&department=" +
+            '' +
+            "&enName=" +
+            ''
+        )
+        .then(response => {
+          if (response.status === 200) {
+              console.log(response.data.records)
+            this.applicationOptions = response.data.records;
           }
         });
     },

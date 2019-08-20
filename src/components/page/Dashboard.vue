@@ -12,8 +12,11 @@
                                     <div>{{role}}</div>
                                 </div>
                             </div>
-                            <div class="user-info-list">办公地点：<span>{{infoData.office}}</span></div>
-                            <div class="user-info-list">联系方式：<span>{{infoData.telphone}}</span></div>
+                            <div class="user-info-list">邮箱：<span>{{infoData.email}}</span></div>
+                            <div class="user-info-list">部门：<span>{{infoData.department}}</span></div>
+                            <div class="user-info-list">职位：<span>{{infoData.position}}</span></div>
+                            <div class="user-info-list">地点：<span>{{infoData.office}}</span></div>
+                            <div class="user-info-list">电话：<span>{{infoData.telphone}}</span></div>
                         </el-card>
                     </el-col>
                 </el-row>

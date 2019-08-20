@@ -2,7 +2,7 @@
     <div>
         <div class="container">
             <div class="handle-box">
-                <el-button type="primary" icon="search" @click="addDialog = true" style="width:100px;margin-right:220px">新增</el-button>
+                <el-button  v-show="role == '1'" type="primary" icon="search" @click="addDialog = true" style="width:100px;margin-right:220px">新增</el-button>
                 <template>
                     
                     <el-select
@@ -61,10 +61,11 @@
                     fixed="right"
                     label="操作"
                     align="center"
-                    width="148">
+                    width="148"
+                    v-if="role == '1'">
                     <template slot-scope = "scope">
                         <div>
-                            <el-button @click.stop="editDialog = true" type="text" size="small" v-show="role == '1'">
+                            <el-button @click.stop="editDialog = true" type="text" size="small">
                                 <i class="el-icon-edit-outline" style="font-size: 17px"></i>
                             </el-button>
                             <el-button  @click.stop="del(scope.$index)" style="color:red" type="text" size="small" >
@@ -86,10 +87,10 @@
                     </el-form-item>
                     <el-form-item label="所属部门" :label-width="formLabelWidth" prop="department">
                         <el-select v-model="addForm.department" placeholder="请选择部门" style="width:250px">
-                            <el-option label="杭州开发一部" value="departOne"></el-option>
-                            <el-option label="杭州开发二部" value="departTwo"></el-option>
-                            <el-option label="杭州开发三部" value="departThree"></el-option>
-                            <el-option label="杭州开发四部" value="departFour"></el-option>
+                            <el-option label="杭州开发一部" value="杭州开发一部"></el-option>
+                            <el-option label="杭州开发二部" value="杭州开发二部"></el-option>
+                            <el-option label="杭州开发三部" value="杭州开发三部"></el-option>
+                            <el-option label="杭州开发四部" value="杭州开发四部"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="contacts">
@@ -121,10 +122,10 @@
                     </el-form-item>
                     <el-form-item label="所属部门" :label-width="formLabelWidth" prop="department">
                         <el-select v-model="editForm.department" placeholder="请选择部门" style="width:250px">
-                            <el-option label="杭州开发一部" value="departOne"></el-option>
-                            <el-option label="杭州开发二部" value="departTwo"></el-option>
-                            <el-option label="杭州开发三部" value="departOne"></el-option>
-                            <el-option label="杭州开发四部" value="departOne"></el-option>
+                            <el-option label="杭州开发一部" value="杭州开发一部"></el-option>
+                            <el-option label="杭州开发二部" value="杭州开发二部"></el-option>
+                            <el-option label="杭州开发三部" value="杭州开发三部"></el-option>
+                            <el-option label="杭州开发四部" value="杭州开发四部"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="应用联系人" :label-width="formLabelWidth" prop="contacts">
@@ -170,6 +171,10 @@ export default {
       selectWord: "",
       applicationValue: "",
       departmentOptions: [
+        {
+          value: "",
+          label: "全部"
+        },
         {
           value: "杭州开发一部",
           label: "杭州开发一部"

@@ -35,7 +35,7 @@
                             </el-col>
                             <el-col :span="3">
                                 <!--position-->
-                                {{infoData.postion}}
+                                {{infoData.position}}
                             </el-col>
                         </el-row>
                         <el-row >
@@ -65,7 +65,7 @@
                             </div>
                             <div>
                                 <i class="el-icon-phone"></i>
-                                电话：{{infoData.telephone}}
+                                电话：{{infoData.telphone}}
                             </div>
                             <div>
                                 <i class="el-icon-receiving"></i>

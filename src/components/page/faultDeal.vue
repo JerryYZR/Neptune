@@ -6,9 +6,9 @@
                     <el-select v-model="applicationValue" placeholder="应用">
                         <el-option
                             v-for="item in applicationOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
+                            :key="item.appId"
+                            :label="item.chName"
+                            :value="item.appId">
                         </el-option>
                     </el-select>
                     <el-select
@@ -44,9 +44,12 @@
                 </el-table-column>
                 <el-table-column
                     align="center"
-                    prop="status"
                     label="状态"
                     width="120">
+                    <template slot-scope="scope">
+                        <div v-if="tableData[scope.$index].status == 0">待处理</div>
+                        <div v-if="tableData[scope.$index].status == 1">已处理</div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     align="center"
@@ -56,7 +59,7 @@
                 </el-table-column>
                 <el-table-column
                     align="center"
-                    prop="linkman"
+                    prop="linkMan"
                     label="联系人"
                     width="120">
                 </el-table-column>
@@ -220,16 +223,12 @@ export default {
       statusValue: "",
       selectWord: "",
       applicationOptions: [
-        {
-          value: "0",
-          label: "F-ABC"
-        },
-        {
-          value: "1",
-          label: "F-CDE"
-        }
       ],
       statusOptions: [
+        {
+          value: "",
+          label: "全部"
+        },
         {
           value: "0",
           label: "已处理"
@@ -279,6 +278,22 @@ export default {
             this.tableData = response.data.records;
             console.log(this.tableData);
             this.total = response.data.total;
+          }
+        });
+
+        this.$axios
+        .post(
+          "/api/api/getInfo?pageNum=" +
+            1 +
+            "&department=" +
+            '' +
+            "&enName=" +
+            ''
+        )
+        .then(response => {
+          if (response.status === 200) {
+              console.log(response.data.records)
+            this.applicationOptions = response.data.records;
           }
         });
     },

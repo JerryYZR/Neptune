@@ -8,6 +8,7 @@
         <div class="container">
             <div class="handle-box">
                 <el-select v-model="select_cate" placeholder="审批状态" class="handle-select mr10">
+                    <el-option key="" label="全部" value="0"></el-option>
                     <el-option key="0" label="待审核" value="0"></el-option>
                     <el-option key="1" label="审核通过" value="1"></el-option>
                     <el-option key="2" label="审核未通过" value="2"></el-option>
@@ -18,7 +19,7 @@
             <el-table :data="applyData" border style="width: 100%" ref="multipleTable" >
                 <el-table-column align="center" width="55" fixed="left">
                     <template slot-scope="scope">
-                        <div>{{scope.$index+1}}</div>
+                        <div>{{scope.$index+(cur_page - 1) * pageSize + 1}} </div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="orgApplyId" label="申请单" align="center" width="170">
@@ -204,6 +205,7 @@ export default {
     return {
       url: "./static/vuetable.json",
       cur_page: 1,
+      pageSize: 10,
       multipleSelection: [],
       select_cate: "",
       total: 1,
@@ -304,7 +306,7 @@ export default {
       if (item.applyType == "新建") {
         this.applyAddVisible = true;
       } else {
-        this.$axios.get("/api/api/orgInfo/" + 1, config).then(response => {
+        this.$axios.get("/api/api/orgInfo/" + this.form.orgId, config).then(response => {
           if (response.status === 200) {
             this.form1 = response.data;
             this.form.oldOrgName = this.form1.orgName;
